@@ -31,7 +31,7 @@ class RegisterFragment : Fragment() {
 
     private lateinit var progressDialog: ProgressDialog
 
-    // firebase database
+    // firestore database
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private var user: FirebaseUser? = null
@@ -55,13 +55,22 @@ class RegisterFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        val id = auth.currentUser?.uid
+        if (id != null) {
+            firestore.collection("users").document(id).get().addOnSuccessListener { user ->
+                Log.i("current user", "${user.data}")
+            }.addOnFailureListener {
+                Log.i("current user", "/")
+            }
+        }
+
         // register new user account
         registerButton.setOnClickListener {
             authenticate()
         }
 
         gotoLogin.setOnClickListener {
-            findNavController().navigate(R.id.homeFragment)
+            findNavController().navigate(R.id.loginFragment)
         }
 
         return binding.root
@@ -73,7 +82,10 @@ class RegisterFragment : Fragment() {
         val password = inputPassword.text.toString()
         val confirmPassword = inputConfirmPassword.text.toString()
 
-        if (!email.matches(emailPattern.toRegex())) {
+        if (username.isEmpty()) {
+            inputUsername.error = "Enter a username"
+        }
+        else if (!email.matches(emailPattern.toRegex())) {
             inputEmail.error = "Enter correct E-mail"
         }
         else if (password.isEmpty() || password.length < 6) {
@@ -103,8 +115,12 @@ class RegisterFragment : Fragment() {
                             Log.e("user", "user failed to be added")
                         }
                     }
+                    else {
+                        Log.i("user", "nobody is currently logged in")
+                    }
                     progressDialog.dismiss()
                     Toast.makeText(context, "Your account was successfully created!", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.loginFragment)
                 }
                 else {
                     progressDialog.dismiss()
