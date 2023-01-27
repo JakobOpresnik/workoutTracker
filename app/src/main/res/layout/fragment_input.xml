@@ -106,7 +106,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/timePicker" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/duration_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -137,7 +137,7 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
+                app:layout_constraintTop_toBottomOf="@+id/duration_input" />
 
             <SeekBar
                 android:id="@+id/motivation_seekbar"

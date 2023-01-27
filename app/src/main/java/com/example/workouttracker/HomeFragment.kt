@@ -11,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentHomeBinding
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,9 +28,10 @@ class HomeFragment : Fragment() {
     private lateinit var restdayButton: Button
     private lateinit var logoutButton: Button
 
+    private lateinit var navigation: BottomNavigationView
+
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-    private var user: FirebaseUser? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +42,31 @@ class HomeFragment : Fragment() {
         workoutButton = binding.workoutButton
         restdayButton = binding.restdayButton
         logoutButton = binding.logoutButton
+
+        navigation = binding.bottomNavigation
+
+        navigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.calendar -> {
+                    true
+                }
+                R.id.stats -> {
+                    true
+                }
+                R.id.new_workout -> {
+                    findNavController().navigate(R.id.homeFragment)
+                    true
+                }
+                R.id.profile -> {
+                    findNavController().navigate(R.id.profileFragment)
+                    true
+                }
+                R.id.settings -> {
+                    true
+                }
+                else -> true
+            }
+        }
 
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()

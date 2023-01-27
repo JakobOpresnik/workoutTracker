@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentRegisterBinding
 import com.example.workouttracker.utils.User
+import com.example.workouttracker.utils.Workout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -104,7 +105,8 @@ class RegisterFragment : Fragment() {
                 if (task.isSuccessful) {
                     user = auth.currentUser
                     val userId = user?.uid
-                    val user = User(username, email)
+                    val workouts = mutableListOf<Workout>()
+                    val user = User(username, email, workouts)
 
                     Log.i("userID", userId.toString())
 
