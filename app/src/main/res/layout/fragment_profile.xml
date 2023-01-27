@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    tools:context=".ProfileFragment">
 
     <ImageView
         android:id="@+id/background"
@@ -22,96 +22,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#6D000000"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="-16dp" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp"
+        android:layout_marginTop="70dp"
         android:fontFamily="@font/montserrat"
-        android:text="Hi"
+        android:text="PROFILE PAGE"
         android:textColor="@color/white"
-        android:textSize="25sp"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.45"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/canvas"
+        android:layout_width="350dp"
+        android:layout_height="500dp"
+        android:src="@drawable/custom_canvas"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.489" />
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="110dp"
-        android:fontFamily="@font/montserrat"
-        android:text=""
-        android:textColor="@color/white"
-        android:textSize="25sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/title"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/question"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:fontFamily="@font/montserrat"
-        android:text="Did you workout today?"
-        android:textColor="@color/white"
-        android:textSize="25sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        android:text=""
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toTopOf="@+id/canvas" />
 
-    <Button
-        android:id="@+id/workout_button"
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/montserrat"
+        android:text=""
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/username" />
+
+    <TextView
+        android:id="@+id/num_workouts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:background="@drawable/custom_big_button_white"
-        android:drawableStart="@drawable/muscle"
-        android:drawablePadding="20dp"
         android:fontFamily="@font/montserrat"
-        android:padding="40dp"
-        android:text="OF COURSE!"
-        android:textColor="@color/black"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/question" />
+        android:text="Number of workouts: "
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/email" />
 
-    <Button
-        android:id="@+id/restday_button"
+    <TextView
+        android:id="@+id/number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/custom_big_button_red"
-        android:drawableStart="@drawable/battery_charging"
-        android:drawablePadding="10dp"
+        android:layout_marginTop="60dp"
         android:fontFamily="@font/montserrat"
-        android:padding="25dp"
-        android:text="REST DAY TODAY"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/workout_button" />
-
-    <Button
-        android:id="@+id/logout_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/custom_button"
-        android:fontFamily="@font/montserrat"
-        android:text="LOG OUT"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/restday_button" />
+        android:text=""
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/num_workouts"
+        app:layout_constraintTop_toBottomOf="@+id/email" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
