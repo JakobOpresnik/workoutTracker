@@ -26,7 +26,7 @@
         tools:layout_editor_absoluteY="-16dp" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="70dp"
@@ -47,14 +47,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintVertical_bias="0.489" />
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="35dp"
         android:fontFamily="@font/montserrat"
         android:text=""
         android:textColor="@color/black"
@@ -77,23 +77,83 @@
         app:layout_constraintTop_toBottomOf="@+id/username" />
 
     <TextView
-        android:id="@+id/num_workouts"
+        android:id="@+id/bio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/montserrat"
-        android:text="Number of workouts: "
+        android:text="BIO"
         android:textColor="@color/black_secondary"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/canvas"
         app:layout_constraintStart_toStartOf="@+id/canvas"
         app:layout_constraintTop_toBottomOf="@+id/email" />
 
+    <EditText
+        android:id="@+id/input_bio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/montserrat"
+        android:hint="Add bio"
+        android:maxLength="25"
+        android:padding="10dp"
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/bio" />
+
+    <TextView
+        android:id="@+id/display_bio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/montserrat"
+        android:padding="10dp"
+        android:text=""
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/bio" />
+
+    <Button
+        android:id="@+id/add_bio_button"
+        android:layout_width="45dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/custom_button"
+        android:drawableStart="@drawable/feather_pen"
+        android:paddingStart="9dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="0dp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/input_bio"
+        app:layout_constraintTop_toBottomOf="@+id/bio" />
+
+    <TextView
+        android:id="@+id/num_workouts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/montserrat"
+        android:text="Number of workouts: "
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
+
     <TextView
         android:id="@+id/number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/montserrat"
         android:text=""
         android:textColor="@color/black_secondary"
@@ -101,7 +161,33 @@
         app:layout_constraintEnd_toEndOf="@+id/canvas"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/num_workouts"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline" />
+
+    <TextView
+        android:id="@+id/popular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/montserrat"
+        android:text="Your most popular activity: "
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/num_workouts" />
+
+    <TextView
+        android:id="@+id/activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/montserrat"
+        android:text=""
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/popular" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -118,5 +204,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.46785226" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

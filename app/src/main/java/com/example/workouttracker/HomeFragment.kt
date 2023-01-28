@@ -44,13 +44,14 @@ class HomeFragment : Fragment() {
         logoutButton = binding.logoutButton
 
         navigation = binding.bottomNavigation
-
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
+                    findNavController().navigate(R.id.calendarFragment)
                     true
                 }
                 R.id.stats -> {
+                    findNavController().navigate(R.id.statsFragment)
                     true
                 }
                 R.id.new_workout -> {
@@ -89,6 +90,10 @@ class HomeFragment : Fragment() {
 
         workoutButton.setOnClickListener {
             findNavController().navigate(R.id.inputFragment)
+        }
+
+        restdayButton.setOnClickListener {
+            findNavController().navigate(R.id.restDayFragment)
         }
 
         logoutButton.setOnClickListener {

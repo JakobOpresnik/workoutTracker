@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentInputBinding
 import com.example.workouttracker.utils.User
 import com.example.workouttracker.utils.Workout
@@ -103,25 +104,23 @@ class InputFragment : Fragment() {
 
                     val startTime = getStartTime()
                     val date = getDate()
-                    val duration = durationInput.text.toString().toInt()
-                    val motivation = motivationValue.text.toString().toInt()
-                    val exhaustion = exhaustionValue.text.toString().toInt()
-                    //val uuid = UUID.randomUUID().toString()
-                    val workout = Workout(selectedWorkoutType, startTime, date, duration, motivation, exhaustion)
+                    if (durationInput.text.toString() != "") {
+                        val duration = durationInput.text.toString().toInt()
+                        val motivation = motivationValue.text.toString().toInt()
+                        val exhaustion = exhaustionValue.text.toString().toInt()
+                        //val uuid = UUID.randomUUID().toString()
+                        val workout = Workout(selectedWorkoutType, startTime, date, duration, motivation, exhaustion)
 
-                    firestore.collection("users").document(id).update("workouts", FieldValue.arrayUnion(workout))
-                        .addOnSuccessListener {
-                            Log.i("workout", "workout successfully added to user")
-                        }.addOnFailureListener {
-                            Log.i("workout", "workout failed to be added to user")
-                        }
-
-
-                    /*firestore.collection("workouts").document(uuid).set(workout).addOnSuccessListener {
-                        Log.i("workout", "workout successfully added")
-                    }.addOnFailureListener {
-                        Log.i("workout", "workout failed to be added")
-                    }*/
+                        firestore.collection("users").document(id).update("workouts", FieldValue.arrayUnion(workout))
+                            .addOnSuccessListener {
+                                Log.i("workout", "workout successfully added to user")
+                            }.addOnFailureListener {
+                                Log.i("workout", "workout failed to be added to user")
+                            }
+                    }
+                    else {
+                        Toast.makeText(context, "missing duration", Toast.LENGTH_SHORT).show()
+                    }
                 }.addOnFailureListener {
                     Log.i("current user", "/")
                 }
@@ -131,7 +130,7 @@ class InputFragment : Fragment() {
                 Log.i("current user", "nobody is logged in")
             }
 
-
+            findNavController().navigate(com.example.workouttracker.R.id.homeFragment)
         }
 
         return binding.root
