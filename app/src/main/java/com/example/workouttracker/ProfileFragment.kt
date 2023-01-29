@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +35,7 @@ class ProfileFragment : Fragment() {
     private lateinit var numberWorkouts: TextView
     private lateinit var popularActivity: TextView
     private lateinit var pastWorkoutsButton: Button
+    private lateinit var logoutButton: Button
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -57,6 +57,7 @@ class ProfileFragment : Fragment() {
         numberWorkouts = binding.number
         popularActivity = binding.activity
         pastWorkoutsButton = binding.pastWorkouts
+        logoutButton = binding.logoutButton
 
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -192,47 +193,154 @@ class ProfileFragment : Fragment() {
         }
 
         if (id != null) {
-            inputBio.visibility = View.GONE
-            addBio.visibility = View.GONE
             firestore.collection("users").document(id).get().addOnSuccessListener { user ->
+                val bio = user.getString("bio")
 
-                displayBio.text = user.getString("bio")
-                displayBio.setOnClickListener {
+                // if user hasn't set a bio yet
+                if (bio == "") {
                     inputBio.visibility = View.VISIBLE
                     addBio.visibility = View.VISIBLE
-                    displayBio.visibility = View.GONE
-                    val editableBio = Editable.Factory.getInstance().newEditable(displayBio.text)
-                    inputBio.text = editableBio
 
+                    // first time setting bio
                     addBio.setOnClickListener {
                         val userBio = inputBio.text
                         val params = displayBio.layoutParams as ConstraintLayout.LayoutParams
                         params.horizontalBias = 0.5f
                         params.verticalBias = 0.5f
 
-                        inputBio.visibility = View.GONE
-                        addBio.visibility = View.GONE
-                        displayBio.visibility = View.VISIBLE
-                        displayBio.layoutParams = params
-                        displayBio.text = userBio.toString()
+                        // if bio is empty
+                        if (userBio.isEmpty()) {
+                            inputBio.visibility = View.VISIBLE
+                            addBio.visibility = View.VISIBLE
+                            displayBio.visibility = View.GONE
+                            displayBio.layoutParams = params
 
-                        firestore.collection("users").document(id)
-                            .update("bio", displayBio.text.toString())
-                            .addOnSuccessListener {
-                                Log.i("bio", "bio added to user")
-                            }.addOnFailureListener {
-                                Log.e("bio", "bio not added to user")
+                            // empty string is saved to database
+                            firestore.collection("users").document(id)
+                                .update("bio", "")
+                                .addOnSuccessListener {
+                                    Log.i("bio", "bio added to user")
+                                }.addOnFailureListener {
+                                    Log.e("bio", "bio not added to user")
+                                }
+
+                            /*displayBio.setOnClickListener {
+                                inputBio.visibility = View.VISIBLE
+                                addBio.visibility = View.VISIBLE
+                                displayBio.visibility = View.GONE
+                                val editableBio = Editable.Factory.getInstance().newEditable(displayBio.text)
+                                inputBio.text = editableBio
+                            }*/
+                        }
+                        // if bio isn't empty
+                        else {
+                            inputBio.visibility = View.GONE
+                            addBio.visibility = View.GONE
+                            displayBio.visibility = View.VISIBLE
+                            displayBio.layoutParams = params
+
+                            displayBio.text = userBio.toString()
+                            // user bio saved to database
+                            firestore.collection("users").document(id)
+                                .update("bio", displayBio.text.toString())
+                                .addOnSuccessListener {
+                                    Log.i("bio", "bio added to user")
+                                }.addOnFailureListener {
+                                    Log.e("bio", "bio not added to user")
+                                }
+
+                            // if user clicks on the bio to edit it
+                            displayBio.setOnClickListener {
+                                inputBio.visibility = View.VISIBLE
+                                addBio.visibility = View.VISIBLE
+                                displayBio.visibility = View.GONE
+                                // bio is set as text into the EditText component
+                                val editableBio = Editable.Factory.getInstance().newEditable(displayBio.text)
+                                inputBio.text = editableBio
                             }
+                        }
                     }
                 }
-            }.addOnFailureListener {
-                Log.i("current user", "/")
+                // if user already had a bio set
+                else {
+                    inputBio.visibility = View.GONE
+                    addBio.visibility = View.GONE
+
+                    displayBio.text = bio
+
+                    // if user tries to edit the bio (by clicking on it)
+                    displayBio.setOnClickListener {
+                        inputBio.visibility = View.VISIBLE
+                        addBio.visibility = View.VISIBLE
+                        displayBio.visibility = View.GONE
+                        var editableBio = Editable.Factory.getInstance().newEditable(displayBio.text)
+                        inputBio.text = editableBio
+
+                        // saving new bio
+                        addBio.setOnClickListener {
+                            val userBio = inputBio.text
+                            val params = displayBio.layoutParams as ConstraintLayout.LayoutParams
+                            params.horizontalBias = 0.5f
+                            params.verticalBias = 0.5f
+
+                            // if bio is empty
+                            if (userBio.isEmpty()) {
+                                inputBio.visibility = View.VISIBLE
+                                addBio.visibility = View.VISIBLE
+                                displayBio.visibility = View.GONE
+                                displayBio.layoutParams = params
+
+                                // empty string is saved to database
+                                firestore.collection("users").document(id)
+                                    .update("bio", "")
+                                    .addOnSuccessListener {
+                                        Log.i("bio", "bio added to user")
+                                    }.addOnFailureListener {
+                                        Log.e("bio", "bio not added to user")
+                                    }
+                            }
+                            // if bio isn't empty
+                            else {
+                                inputBio.visibility = View.GONE
+                                addBio.visibility = View.GONE
+                                displayBio.visibility = View.VISIBLE
+                                displayBio.layoutParams = params
+
+                                displayBio.text = userBio.toString()
+                                // user bio saved to database
+                                firestore.collection("users").document(id)
+                                    .update("bio", displayBio.text.toString())
+                                    .addOnSuccessListener {
+                                        Log.i("bio", "bio added to user")
+                                    }.addOnFailureListener {
+                                        Log.e("bio", "bio not added to user")
+                                    }
+
+                                // if user clicks on the bio to edit it
+                                displayBio.setOnClickListener {
+                                    inputBio.visibility = View.VISIBLE
+                                    addBio.visibility = View.VISIBLE
+                                    displayBio.visibility = View.GONE
+                                    // bio is set as text into the EditText component
+                                    editableBio = Editable.Factory.getInstance().newEditable(displayBio.text)
+                                    inputBio.text = editableBio
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         pastWorkoutsButton.setOnClickListener {
             findNavController().navigate(R.id.listWorkoutsFragment)
         }
+
+        logoutButton.setOnClickListener {
+            logout()
+            findNavController().navigate(R.id.loginFragment)
+        }
+
 
         return binding.root
     }
@@ -242,5 +350,9 @@ class ProfileFragment : Fragment() {
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         return currentDate.format(formatter)
+    }
+
+    private fun logout() {
+        auth.signOut()
     }
 }

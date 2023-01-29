@@ -29,7 +29,7 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="35dp"
         android:fontFamily="@font/montserrat"
         android:text="PROFILE PAGE"
         android:textColor="@color/white"
@@ -41,7 +41,7 @@
     <ImageView
         android:id="@+id/canvas"
         android:layout_width="350dp"
-        android:layout_height="500dp"
+        android:layout_height="530dp"
         android:src="@drawable/custom_canvas"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +54,7 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="25dp"
         android:fontFamily="@font/montserrat"
         android:text=""
         android:textColor="@color/black"
@@ -80,7 +80,7 @@
         android:id="@+id/bio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:fontFamily="@font/montserrat"
         android:text="BIO"
         android:textColor="@color/black_secondary"
@@ -140,7 +140,7 @@
         android:id="@+id/num_workouts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/montserrat"
         android:text="Number of workouts: "
         android:textColor="@color/black_secondary"
@@ -153,7 +153,7 @@
         android:id="@+id/number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/montserrat"
         android:text=""
         android:textColor="@color/black_secondary"
@@ -167,7 +167,7 @@
         android:id="@+id/popular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="@font/montserrat"
         android:text="Your most popular activity: "
         android:textColor="@color/black_secondary"
@@ -189,37 +189,34 @@
         app:layout_constraintStart_toStartOf="@+id/canvas"
         app:layout_constraintTop_toBottomOf="@+id/popular" />
 
-    <TextView
-        android:id="@+id/past_workouts_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:fontFamily="@font/montserrat"
-        android:gravity="center"
-        android:text="Check out a list\nof all your past workouts"
-        android:textColor="@color/black_secondary"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/canvas"
-        app:layout_constraintStart_toStartOf="@+id/canvas"
-        app:layout_constraintTop_toBottomOf="@+id/activity" />
-
     <Button
         android:id="@+id/past_workouts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/custom_button"
         android:fontFamily="@font/montserrat"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="MY WORKOUTS"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/activity" />
+
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/montserrat"
+        android:padding="15dp"
+        android:text="LOG OUT"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/canvas"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/past_workouts_text"
-        app:layout_constraintVertical_bias="0.0" />
-
+        app:layout_constraintTop_toBottomOf="@+id/past_workouts" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -241,6 +238,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.46785226" />
+        app:layout_constraintGuide_percent="0.43091655" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

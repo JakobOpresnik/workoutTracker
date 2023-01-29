@@ -25,6 +25,7 @@ class ListWorkoutsFragment : Fragment() {
     private lateinit var binding: FragmentListWorkoutsBinding
     private lateinit var adapter: RecyclerAdapter
     private lateinit var saveFilterButton: ImageButton
+    private lateinit var numberWorkouts: TextView
     private lateinit var noWorkoutText: TextView
 
     private lateinit var selectedWorkoutType: String
@@ -34,12 +35,14 @@ class ListWorkoutsFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentListWorkoutsBinding.inflate(inflater, container, false)
         saveFilterButton = binding.saveTypeFilter
+        numberWorkouts = binding.numberWorkouts
         noWorkoutText = binding.noWorkouts
         noWorkoutText.visibility = View.GONE
 
@@ -95,6 +98,7 @@ class ListWorkoutsFragment : Fragment() {
                                     }
                                 }
                                 try {
+                                    addNumberWorkouts(data.size)
                                     binding.recyclerView.layoutManager =
                                         LinearLayoutManager(this.context)
                                     adapter = RecyclerAdapter(
@@ -157,10 +161,7 @@ class ListWorkoutsFragment : Fragment() {
                                 Log.i("current user", "/")
                         }
                     }
-
-                    /*if (data.isEmpty()) {
-                        handleNoWorkouts()
-                    }*/
+                    addNumberWorkouts(data.size)
                     try {
                         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
                         adapter = RecyclerAdapter(data, object: RecyclerAdapter.myOnClick {
@@ -220,5 +221,15 @@ class ListWorkoutsFragment : Fragment() {
         val newText = "$substringText $workoutType workouts yet \uD83D\uDE34"
         noWorkoutText.text = newText
         noWorkoutText.visibility = View.VISIBLE
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun addNumberWorkouts(number: Int) {
+        if (number == 1) {
+            numberWorkouts.text = "$number workout"
+        }
+        else {
+            numberWorkouts.text = "$number workouts"
+        }
     }
 }
