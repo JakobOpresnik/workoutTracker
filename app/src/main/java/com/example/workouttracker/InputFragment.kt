@@ -130,7 +130,7 @@ class InputFragment : Fragment() {
                 Log.i("current user", "nobody is logged in")
             }
 
-            findNavController().navigate(com.example.workouttracker.R.id.homeFragment)
+            findNavController().navigate(com.example.workouttracker.R.id.lobbyFragment)
         }
 
         return binding.root

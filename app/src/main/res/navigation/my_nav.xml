@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_homeFragment_to_homeFragment2"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_lobbyFragment"
+            app:destination="@id/lobbyFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -121,5 +124,17 @@
         <action
             android:id="@+id/action_restDayFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lobbyFragment"
+        android:name="com.example.workouttracker.LobbyFragment"
+        android:label="fragment_lobby"
+        tools:layout="@layout/fragment_lobby" >
+        <action
+            android:id="@+id/action_lobbyFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="number_workouts"
+            app:argType="string" />
     </fragment>
 </navigation>

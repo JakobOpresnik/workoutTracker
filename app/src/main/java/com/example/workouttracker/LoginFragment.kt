@@ -1,7 +1,9 @@
 package com.example.workouttracker
 
 import android.app.ProgressDialog
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +12,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class LoginFragment : Fragment() {
 
@@ -37,6 +42,7 @@ class LoginFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,8 +59,35 @@ class LoginFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        // login and navigate to new workout page immediately if you haven't done a workout today yet
+        // otherwise navigate to the lobby page (with option to navigate to new workout page)
         loginButton.setOnClickListener {
             login()
+            val id = auth.currentUser?.uid
+            if (id != null) {
+                firestore.collection("users").document(id).get()
+                    .addOnSuccessListener { user ->
+                        val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                        val currentDate = getDate()
+                        var todayWorkoutCounter = 0
+                        for (workout in workouts) {
+                            if (workout["date"] == currentDate) {
+                                todayWorkoutCounter++
+                            }
+                        }
+                        if (todayWorkoutCounter > 0) {
+                            val bundle = Bundle()
+                            bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
+                            findNavController().navigate(R.id.lobbyFragment, bundle)
+                        }
+                        else {
+                            findNavController().navigate(R.id.homeFragment)
+                        }
+                }.addOnFailureListener {
+                    Log.i("current user", "/")
+                }
+            }
+
         }
 
         createNewAccount.setOnClickListener {
@@ -84,7 +117,6 @@ class LoginFragment : Fragment() {
                 if (task.isSuccessful) {
                     progressDialog.dismiss()
                     Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.homeFragment)
                 }
                 else {
                     progressDialog.dismiss()
@@ -92,5 +124,12 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDate(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        return currentDate.format(formatter)
     }
 }

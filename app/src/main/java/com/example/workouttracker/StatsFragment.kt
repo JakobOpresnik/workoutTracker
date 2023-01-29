@@ -49,7 +49,7 @@ class StatsFragment : Fragment() {
                     true
                 }
                 R.id.new_workout -> {
-                    findNavController().navigate(R.id.homeFragment)
+                    findNavController().navigate(R.id.lobbyFragment)
                     true
                 }
                 R.id.profile -> {
