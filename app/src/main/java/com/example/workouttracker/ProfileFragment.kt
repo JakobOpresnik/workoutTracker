@@ -51,6 +51,8 @@ class ProfileFragment : Fragment() {
         numberWorkouts = binding.number
         popularActivity = binding.activity
 
+        navigation.selectedItemId = R.id.profile
+
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
@@ -72,7 +74,7 @@ class ProfileFragment : Fragment() {
                 R.id.settings -> {
                     true
                 }
-                else -> true
+                else -> false
             }
         }
 

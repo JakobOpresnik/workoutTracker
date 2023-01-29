@@ -23,8 +23,10 @@ class CalendarFragment : Fragment() {
     ): View? {
         binding = FragmentCalendarBinding.inflate(inflater, container, false)
         calendar = binding.calendar
-
         navigation = binding.bottomNavigation
+
+        navigation.selectedItemId = R.id.calendar
+
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
@@ -46,7 +48,7 @@ class CalendarFragment : Fragment() {
                 R.id.settings -> {
                     true
                 }
-                else -> true
+                else -> false
             }
         }
 

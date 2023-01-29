@@ -42,8 +42,10 @@ class HomeFragment : Fragment() {
         workoutButton = binding.workoutButton
         restdayButton = binding.restdayButton
         logoutButton = binding.logoutButton
-
         navigation = binding.bottomNavigation
+
+        navigation.selectedItemId = R.id.new_workout
+
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
@@ -65,7 +67,7 @@ class HomeFragment : Fragment() {
                 R.id.settings -> {
                     true
                 }
-                else -> true
+                else -> false
             }
         }
 

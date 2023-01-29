@@ -34,11 +34,14 @@ class StatsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentStatsBinding.inflate(inflater, container, false)
-
         navigation = binding.bottomNavigation
+
+        navigation.selectedItemId = R.id.stats
+
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
+                    findNavController().navigate(R.id.calendarFragment)
                     true
                 }
                 R.id.stats -> {
@@ -56,7 +59,7 @@ class StatsFragment : Fragment() {
                 R.id.settings -> {
                     true
                 }
-                else -> true
+                else -> false
             }
         }
 

@@ -42,7 +42,7 @@ class RestDayFragment : Fragment() {
                 R.id.settings -> {
                     true
                 }
-                else -> true
+                else -> false
             }
         }
 
