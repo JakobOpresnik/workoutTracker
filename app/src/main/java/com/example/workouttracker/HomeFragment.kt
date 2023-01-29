@@ -1,5 +1,6 @@
 package com.example.workouttracker
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -16,6 +18,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class HomeFragment : Fragment() {
 
@@ -33,6 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,7 +62,28 @@ class HomeFragment : Fragment() {
                     true
                 }
                 R.id.new_workout -> {
-                    findNavController().navigate(R.id.lobbyFragment)
+                    val id = auth.currentUser?.uid
+                    if (id != null) {
+                        firestore.collection("users").document(id).get()
+                            .addOnSuccessListener { user ->
+                                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                                val currentDate = getDate()
+                                var todayWorkoutCounter = 0
+                                for (workout in workouts) {
+                                    if (workout["date"] == currentDate) {
+                                        todayWorkoutCounter++
+                                    }
+                                }
+                                if (todayWorkoutCounter > 0) {
+                                    findNavController().navigate(R.id.lobbyFragment)
+                                }
+                                else {
+                                    findNavController().navigate(R.id.homeFragment)
+                                }
+                            }.addOnFailureListener {
+                                Log.i("current user", "/")
+                            }
+                    }
                     true
                 }
                 R.id.profile -> {
@@ -108,5 +134,12 @@ class HomeFragment : Fragment() {
 
     private fun logout() {
         auth.signOut()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDate(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        return currentDate.format(formatter)
     }
 }

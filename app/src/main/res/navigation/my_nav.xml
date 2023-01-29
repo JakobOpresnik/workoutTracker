@@ -76,6 +76,9 @@
         <action
             android:id="@+id/action_profileFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_listWorkoutsFragment"
+            app:destination="@id/listWorkoutsFragment" />
     </fragment>
     <fragment
         android:id="@+id/statsFragment"
@@ -136,5 +139,14 @@
         <argument
             android:name="number_workouts"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/listWorkoutsFragment"
+        android:name="com.example.workouttracker.ListWorkoutsFragment"
+        android:label="fragment_list_workouts"
+        tools:layout="@layout/fragment_list_workouts" >
+        <action
+            android:id="@+id/action_listWorkoutsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 </navigation>

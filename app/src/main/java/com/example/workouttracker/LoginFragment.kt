@@ -76,9 +76,9 @@ class LoginFragment : Fragment() {
                             }
                         }
                         if (todayWorkoutCounter > 0) {
-                            val bundle = Bundle()
-                            bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
-                            findNavController().navigate(R.id.lobbyFragment, bundle)
+                            //val bundle = Bundle()
+                            //bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
+                            findNavController().navigate(R.id.lobbyFragment)
                         }
                         else {
                             findNavController().navigate(R.id.homeFragment)
@@ -87,7 +87,6 @@ class LoginFragment : Fragment() {
                     Log.i("current user", "/")
                 }
             }
-
         }
 
         createNewAccount.setOnClickListener {

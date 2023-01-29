@@ -117,9 +117,11 @@ class InputFragment : Fragment() {
                             }.addOnFailureListener {
                                 Log.i("workout", "workout failed to be added to user")
                             }
+                        findNavController().navigate(com.example.workouttracker.R.id.lobbyFragment)
                     }
                     else {
-                        Toast.makeText(context, "missing duration", Toast.LENGTH_SHORT).show()
+                        durationInput.error = "Enter duration"
+                        //Toast.makeText(context, "missing duration", Toast.LENGTH_SHORT).show()
                     }
                 }.addOnFailureListener {
                     Log.i("current user", "/")
@@ -130,7 +132,6 @@ class InputFragment : Fragment() {
                 Log.i("current user", "nobody is logged in")
             }
 
-            findNavController().navigate(com.example.workouttracker.R.id.lobbyFragment)
         }
 
         return binding.root

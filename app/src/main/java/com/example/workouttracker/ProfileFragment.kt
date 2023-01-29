@@ -1,6 +1,7 @@
 package com.example.workouttracker
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -13,12 +14,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentProfileBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class ProfileFragment : Fragment() {
 
@@ -31,10 +35,12 @@ class ProfileFragment : Fragment() {
     private lateinit var displayBio: TextView
     private lateinit var numberWorkouts: TextView
     private lateinit var popularActivity: TextView
+    private lateinit var pastWorkoutsButton: Button
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +56,10 @@ class ProfileFragment : Fragment() {
         displayBio = binding.displayBio
         numberWorkouts = binding.number
         popularActivity = binding.activity
+        pastWorkoutsButton = binding.pastWorkouts
+
+        firestore = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         navigation.selectedItemId = R.id.profile
 
@@ -64,7 +74,28 @@ class ProfileFragment : Fragment() {
                     true
                 }
                 R.id.new_workout -> {
-                    findNavController().navigate(R.id.lobbyFragment)
+                    val id = auth.currentUser?.uid
+                    if (id != null) {
+                        firestore.collection("users").document(id).get()
+                            .addOnSuccessListener { user ->
+                                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                                val currentDate = getDate()
+                                var todayWorkoutCounter = 0
+                                for (workout in workouts) {
+                                    if (workout["date"] == currentDate) {
+                                        todayWorkoutCounter++
+                                    }
+                                }
+                                if (todayWorkoutCounter > 0) {
+                                    findNavController().navigate(R.id.lobbyFragment)
+                                }
+                                else {
+                                    findNavController().navigate(R.id.homeFragment)
+                                }
+                            }.addOnFailureListener {
+                                Log.i("current user", "/")
+                            }
+                    }
                     true
                 }
                 R.id.profile -> {
@@ -77,9 +108,6 @@ class ProfileFragment : Fragment() {
                 else -> false
             }
         }
-
-        firestore = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
 
         var counterWeightlifting = 0
         var counterGymCardio = 0
@@ -202,6 +230,17 @@ class ProfileFragment : Fragment() {
             }
         }
 
+        pastWorkoutsButton.setOnClickListener {
+            findNavController().navigate(R.id.listWorkoutsFragment)
+        }
+
         return binding.root
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDate(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        return currentDate.format(formatter)
     }
 }

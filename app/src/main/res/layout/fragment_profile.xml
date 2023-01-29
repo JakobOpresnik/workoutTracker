@@ -189,6 +189,37 @@
         app:layout_constraintStart_toStartOf="@+id/canvas"
         app:layout_constraintTop_toBottomOf="@+id/popular" />
 
+    <TextView
+        android:id="@+id/past_workouts_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/montserrat"
+        android:gravity="center"
+        android:text="Check out a list\nof all your past workouts"
+        android:textColor="@color/black_secondary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/canvas"
+        app:layout_constraintStart_toStartOf="@+id/canvas"
+        app:layout_constraintTop_toBottomOf="@+id/activity" />
+
+    <Button
+        android:id="@+id/past_workouts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/montserrat"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="MY WORKOUTS"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/canvas"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/past_workouts_text"
+        app:layout_constraintVertical_bias="0.0" />
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

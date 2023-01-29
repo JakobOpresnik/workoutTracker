@@ -2,12 +2,14 @@ package com.example.workouttracker
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentStatsBinding
 import com.github.mikephil.charting.charts.BarChart
@@ -18,6 +20,8 @@ import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class StatsFragment : Fragment() {
 
@@ -29,12 +33,16 @@ class StatsFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentStatsBinding.inflate(inflater, container, false)
         navigation = binding.bottomNavigation
+
+        firestore = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         navigation.selectedItemId = R.id.stats
 
@@ -49,7 +57,28 @@ class StatsFragment : Fragment() {
                     true
                 }
                 R.id.new_workout -> {
-                    findNavController().navigate(R.id.lobbyFragment)
+                    val id = auth.currentUser?.uid
+                    if (id != null) {
+                        firestore.collection("users").document(id).get()
+                            .addOnSuccessListener { user ->
+                                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                                val currentDate = getDate()
+                                var todayWorkoutCounter = 0
+                                for (workout in workouts) {
+                                    if (workout["date"] == currentDate) {
+                                        todayWorkoutCounter++
+                                    }
+                                }
+                                if (todayWorkoutCounter > 0) {
+                                    findNavController().navigate(R.id.lobbyFragment)
+                                }
+                                else {
+                                    findNavController().navigate(R.id.homeFragment)
+                                }
+                            }.addOnFailureListener {
+                                Log.i("current user", "/")
+                            }
+                    }
                     true
                 }
                 R.id.profile -> {
@@ -62,9 +91,6 @@ class StatsFragment : Fragment() {
                 else -> false
             }
         }
-
-        firestore = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
 
         var counterWeightlifting = 0
         var counterGymCardio = 0
@@ -103,12 +129,12 @@ class StatsFragment : Fragment() {
                 val totalActivites = counterWeightlifting + counterGymCardio + counterRun + counterSprint + counterHike + counterBicycle
                 pieChart = binding.piechart
                 val entries = ArrayList<PieEntry>()
-                entries.add(PieEntry(40f, "Weightlifting"))
-                entries.add(PieEntry(60f, "Gym Cardio"))
-                entries.add(PieEntry(counterRun/3f, "Run"))
-                entries.add(PieEntry(counterSprint/3f, "Sprint"))
-                entries.add(PieEntry(counterHike/3f, "Hike"))
-                entries.add(PieEntry(counterBicycle/3f, "Bike"))
+                entries.add(PieEntry(counterWeightlifting/totalActivites.toFloat(), "Weightlifting"))
+                entries.add(PieEntry(counterGymCardio/totalActivites.toFloat(), "Gym Cardio"))
+                entries.add(PieEntry(counterRun/totalActivites.toFloat(), "Run"))
+                entries.add(PieEntry(counterSprint/totalActivites.toFloat(), "Sprint"))
+                entries.add(PieEntry(counterHike/totalActivites.toFloat(), "Hike"))
+                entries.add(PieEntry(counterBicycle/totalActivites.toFloat(), "Bike"))
                 val dataSet = PieDataSet(entries, "")
                 dataSet.valueTextSize = 15f
                 dataSet.valueTextColor = Color.WHITE
@@ -141,9 +167,6 @@ class StatsFragment : Fragment() {
             }
         }
 
-
-
-
         /*barchart = binding.barchart
         val data = BarData(
             listOf(
@@ -160,5 +183,12 @@ class StatsFragment : Fragment() {
         barchart.data = data*/
 
         return binding.root
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDate(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        return currentDate.format(formatter)
     }
 }
