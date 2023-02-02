@@ -1,7 +1,5 @@
 package com.example.workouttracker.utils
 
-import java.util.UUID
-
 enum class WorkoutType {
     WEIGHTLIFTING,
     GYM_CARDIO,

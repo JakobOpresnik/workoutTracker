@@ -1,6 +1,5 @@
 package com.example.workouttracker
 
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,11 +11,15 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentStatsBinding
-import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.DefaultValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,6 +43,7 @@ class StatsFragment : Fragment() {
     ): View? {
         binding = FragmentStatsBinding.inflate(inflater, container, false)
         navigation = binding.bottomNavigation
+        pieChart = binding.piechart
 
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -92,6 +96,43 @@ class StatsFragment : Fragment() {
             }
         }
 
+
+
+        val id = auth.currentUser?.uid
+        if (id != null) {
+            firestore.collection("users").document(id).get().addOnSuccessListener { user ->
+                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                setupPieChart()
+                loadPieChartData(workouts)
+            }.addOnFailureListener {
+                Log.i("current user", "/")
+            }
+        }
+
+        return binding.root
+    }
+
+    private fun setupPieChart() {
+        pieChart.isDrawHoleEnabled = true
+        pieChart.setUsePercentValues(true)
+        pieChart.setEntryLabelTextSize(12F)
+        pieChart.centerText = "Your workout categories"
+        pieChart.setCenterTextSize(20F)
+        pieChart.description.isEnabled = false
+
+        // setup piechart legend
+        val legend = pieChart.legend
+        legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+        legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+        legend.orientation = Legend.LegendOrientation.VERTICAL
+        legend.textColor = Color.WHITE
+        legend.textSize = 17F
+        legend.yOffset = 10F
+        legend.setDrawInside(false)
+        legend.isEnabled = true
+    }
+
+    private fun loadPieChartData(workouts: MutableList<HashMap<String, String>>) {
         var counterWeightlifting = 0
         var counterGymCardio = 0
         var counterRun = 0
@@ -99,90 +140,74 @@ class StatsFragment : Fragment() {
         var counterHike = 0
         var counterBicycle = 0
 
-        val id = auth.currentUser?.uid
-        if (id != null) {
-            firestore.collection("users").document(id).get().addOnSuccessListener { user ->
-                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
-                // count each type of workout
-                for (workout in workouts) {
-                    when (workout["type"]) {
-                        "WEIGHTLIFTING" -> {
-                            counterWeightlifting++
-                        }
-                        "GYM_CARDIO" -> {
-                            counterGymCardio++
-                        }
-                        "RUN" -> {
-                            counterRun++
-                        }
-                        "SPRINT" -> {
-                            counterSprint++
-                        }
-                        "HIKE" -> {
-                            counterHike++
-                        }
-                        "BICYCLE_RIDE" -> {
-                            counterBicycle++
-                        }
-                    }
+        // count each type of workout
+        for (workout in workouts) {
+            when (workout["type"]) {
+                "WEIGHTLIFTING" -> {
+                    counterWeightlifting++
                 }
-                val totalActivites = counterWeightlifting + counterGymCardio + counterRun + counterSprint + counterHike + counterBicycle
-                pieChart = binding.piechart
-                val entries = ArrayList<PieEntry>()
-                entries.add(PieEntry(counterWeightlifting/totalActivites.toFloat(), "Weightlifting"))
-                entries.add(PieEntry(counterGymCardio/totalActivites.toFloat(), "Gym Cardio"))
-                entries.add(PieEntry(counterRun/totalActivites.toFloat(), "Run"))
-                entries.add(PieEntry(counterSprint/totalActivites.toFloat(), "Sprint"))
-                entries.add(PieEntry(counterHike/totalActivites.toFloat(), "Hike"))
-                entries.add(PieEntry(counterBicycle/totalActivites.toFloat(), "Bike"))
-                val dataSet = PieDataSet(entries, "")
-                dataSet.valueTextSize = 15f
-                dataSet.valueTextColor = Color.WHITE
-
-                val colors = ArrayList<Int>()
-                colors.add(Color.RED)
-                colors.add(Color.BLUE)
-                colors.add(Color.YELLOW)
-                colors.add(Color.GREEN)
-                colors.add(Color.MAGENTA)
-                colors.add(Color.CYAN)
-                dataSet.colors = colors
-                pieChart.holeRadius = 0f
-                pieChart.setDrawSlicesUnderHole(false)
-                val data = PieData(dataSet)
-                pieChart.data = data
-
-                val legend = pieChart.legend
-                legend.textColor = Color.WHITE
-                legend.textSize = 20f
-                legend.isWordWrapEnabled = true
-                legend.maxSizePercent = 0.5f
-                legend.yOffset = 0f
-
-                dataSet.setDrawIcons(true)
-                dataSet.setDrawValues(false)
-
-            }.addOnFailureListener {
-                Log.i("current user", "/")
+                "GYM_CARDIO" -> {
+                    counterGymCardio++
+                }
+                "RUN" -> {
+                    counterRun++
+                }
+                "SPRINT" -> {
+                    counterSprint++
+                }
+                "HIKE" -> {
+                    counterHike++
+                }
+                "BICYCLE_RIDE" -> {
+                    counterBicycle++
+                }
             }
         }
 
-        /*barchart = binding.barchart
-        val data = BarData(
-            listOf(
-                BarDataSet(
-                    listOf(
-                        BarEntry(0f, 0f),
-                        BarEntry(1f, 1f),
-                        BarEntry(2f, 2f),
-                        BarEntry(3f, 3f)
-                    ), "Data Set 1"
-                )
-            )
-        )
-        barchart.data = data*/
+        // setup entries
+        val totalActivites = counterWeightlifting + counterGymCardio + counterRun + counterSprint + counterHike + counterBicycle
+        val entries = ArrayList<PieEntry>()
+        if (counterWeightlifting/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterWeightlifting/totalActivites.toFloat(), "Weightlifting"))
+        }
+        if (counterGymCardio/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterGymCardio/totalActivites.toFloat(), "Gym Cardio"))
+        }
+        if (counterRun/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterRun/totalActivites.toFloat(), "Run"))
+        }
+        if (counterSprint/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterSprint/totalActivites.toFloat(), "Sprint"))
+        }
+        if (counterHike/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterHike/totalActivites.toFloat(), "Hike"))
+        }
+        if (counterBicycle/totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterBicycle/totalActivites.toFloat(), "Bike"))
+        }
+        val dataSet = PieDataSet(entries, "")
 
-        return binding.root
+        // setup colors
+        val colors = ArrayList<Int>()
+        for (color in ColorTemplate.MATERIAL_COLORS) {
+            colors.add(color)
+        }
+        for (color in ColorTemplate.VORDIPLOM_COLORS) {
+            colors.add(color)
+        }
+        dataSet.colors = colors
+
+        val data = PieData(dataSet)
+        data.setDrawValues(true)    // display actual values
+        data.setValueFormatter(PercentFormatter(pieChart))  // format values to percentages
+        dataSet.valueTextSize = 15f
+        dataSet.valueTextColor = Color.WHITE
+
+        pieChart.data = data
+        pieChart.invalidate()   // updates chart
+
+        // adding animation
+        pieChart.animateY(1200, Easing.EaseInOutQuad)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

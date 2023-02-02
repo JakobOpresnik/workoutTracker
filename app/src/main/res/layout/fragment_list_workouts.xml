@@ -67,6 +67,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
+            <Spinner
+                android:id="@+id/sort_date"
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/custom_button"
+                android:entries="@array/workout_sort"
+                android:spinnerMode="dialog"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/type_filter"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
             <ImageButton
                 android:id="@+id/save_type_filter"
                 android:layout_width="wrap_content"
@@ -81,7 +95,7 @@
                 android:textSize="17sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/type_filter"
+                app:layout_constraintStart_toEndOf="@+id/sort_date"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <TextView

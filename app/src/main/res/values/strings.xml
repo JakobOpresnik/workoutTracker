@@ -9,6 +9,15 @@
         <item>Hike</item>
         <item>Bicycle Ride</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="workout_sort">
+        <item>earliest first</item>
+        <item>latest first</item>
+        <item>best motivation first</item>
+        <item>worst motivation first</item>
+        <item>least exhaustive first</item>
+        <item>most exhaustive first</item>
+        <item>best first</item>
+        <item>worst first</item>
+    </string-array>
 </resources>

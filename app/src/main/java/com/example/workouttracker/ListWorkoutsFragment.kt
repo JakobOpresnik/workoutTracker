@@ -29,6 +29,7 @@ class ListWorkoutsFragment : Fragment() {
     private lateinit var noWorkoutText: TextView
 
     private lateinit var selectedWorkoutType: String
+    private lateinit var selectedSorting: String
 
     private lateinit var data: MutableList<HashMap<String, String>>
 
@@ -49,6 +50,7 @@ class ListWorkoutsFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        // workout type filter
         val spinner = binding.typeFilter
         val spinnerData = arrayListOf("All", "Weightlifting", "Gym Cardio", "Run", "Sprint", "Hike", "Bicycle Ride")
         val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, spinnerData)
@@ -59,6 +61,26 @@ class ListWorkoutsFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedWorkoutType = parent?.getItemAtPosition(position).toString().replace(" ", "_").toUpperCase()
                 Log.i("selected workout type", selectedWorkoutType)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // workout sorting by date
+        val sortSpinner = binding.sortDate
+        val sortSpinnerData = arrayListOf("earliest first", "latest first", "best motivation first", "worst motivation first", "least exhaustive first", "most exhaustive first", "best first", "worst first")
+        val sortSpinnerAdapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, sortSpinnerData)
+        sortSpinner.adapter = sortSpinnerAdapter
+
+        sortSpinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_item)
+        sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                selectedSorting = parent?.getItemAtPosition(position).toString()
+                Log.i("selected workout sorting by date", selectedSorting)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
@@ -80,85 +102,121 @@ class ListWorkoutsFragment : Fragment() {
                         binding.recyclerView.visibility = View.VISIBLE
 
                         data = mutableListOf<HashMap<String, String>>()
-                        firestore.collection("users").document(id).get()
-                            .addOnSuccessListener { user ->
-                                val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
-                                if (selectedWorkoutType == "ALL") {
-                                    data = workouts
+                        var workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                        for (workout in workouts) {
+                            val motivation = workout["motivation"].toString().toDouble()
+                            val exhaustion = workout["exhaustion"].toString().toDouble()
+                            if (exhaustion.toInt() != 0) {
+                                workout["success_ratio"] = (motivation / exhaustion).toString()
+                            }
+                            else if (exhaustion.toInt() == 0) {
+                                workout["success_ratio"] = (motivation+1).toString()
+                            }
+                        }
+
+                        // sort hashmap
+                        when (selectedSorting) {
+                            "latest first" -> {
+                                workouts.reverse()
+                            }
+                            "best motivation first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["motivation"] }).reversed() as MutableList<HashMap<String, String>>
+                            }
+                            "worst motivation first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["motivation"] }) as MutableList<HashMap<String, String>>
+                            }
+                            "least exhaustive first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["exhaustion"] }) as MutableList<HashMap<String, String>>
+                            }
+                            "most exhaustive first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["exhaustion"] }).reversed() as MutableList<HashMap<String, String>>
+                            }
+                            "best first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["success_ratio"] }).reversed() as MutableList<HashMap<String, String>>
+                            }
+                            "worst first" -> {
+                                workouts = workouts.sortedWith(compareBy { it["success_ratio"] }) as MutableList<HashMap<String, String>>
+                            }
+                        }
+
+                        // filter hashmap
+                        if (selectedWorkoutType == "ALL") {
+                            data = workouts
+                            /*for (workout in data) {
+                                Log.i("success", workout["success_ratio"].toString())
+                                Log.i("type", workout["type"].toString())
+                            }*/
+                        }
+                        else {
+                            for (workout in workouts) {
+                                if (workout["type"] == selectedWorkoutType) {
+                                    data.add(workout)
                                 }
-                                else {
-                                    for (workout in workouts) {
-                                        if (workout["type"] == selectedWorkoutType) {
-                                            data.add(workout)
+                            }
+                            // if a user has no workouts of a particular type yet
+                            if (data.isEmpty()) {
+                                handleNoWorkouts()
+                            }
+                        }
+                        try {
+                            addNumberWorkouts(data.size)
+                            binding.recyclerView.layoutManager =
+                                LinearLayoutManager(this.context)
+                            adapter = RecyclerAdapter(
+                                data,
+                                object : RecyclerAdapter.myOnClick {
+                                    @SuppressLint("NotifyDataSetChanged")
+                                    override fun onClick(p0: View?, position: Int) {
+                                        val builder =
+                                            AlertDialog.Builder(this@ListWorkoutsFragment.requireContext())
+                                        builder.setTitle("DELETE THIS WORKOUT?")
+                                        builder.setMessage("Are you sure you want to delete one of your previously saved workout sessions?")
+                                        builder.setIcon(R.drawable.ic_dialog_alert)
+                                        builder.setPositiveButton("Yes") { dialogInterface, which ->
+                                            Toast.makeText(
+                                                context,
+                                                "deleting workout session...",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            //val documentId = data[position].getID()
+                                            data.removeAt(position)
+                                            adapter.notifyDataSetChanged()
+
+
+                                            /*firebase = FirebaseFirestore.getInstance()
+                                    firebase.collection("reservations").document(documentId)
+                                        .delete()
+                                        .addOnSuccessListener {
+                                            //Toast.makeText(activity?.applicationContext, "successfully deleted reservation from firebase", Toast.LENGTH_SHORT).show()
                                         }
+                                        .addOnFailureListener {
+                                            //Toast.makeText(activity?.applicationContext, "failed to delete reservation from firebase", Toast.LENGTH_SHORT).show()
+                                        }*/
+
+                                        }
+                                        builder.setNeutralButton("Cancel") { dialogInterface, which ->
+                                            Toast.makeText(
+                                                context,
+                                                "deletion cancelled",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        builder.setNegativeButton("No") { dialogInterface, which ->
+                                            Toast.makeText(
+                                                context,
+                                                "deletion rejected",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        val alertDialog: AlertDialog =
+                                            builder.create()
+                                        alertDialog.setCancelable(false)
+                                        alertDialog.show()
                                     }
-                                    // if a user has no workouts of a particular type yet
-                                    if (data.isEmpty()) {
-                                        handleNoWorkouts()
-                                    }
-                                }
-                                try {
-                                    addNumberWorkouts(data.size)
-                                    binding.recyclerView.layoutManager =
-                                        LinearLayoutManager(this.context)
-                                    adapter = RecyclerAdapter(
-                                        data,
-                                        object : RecyclerAdapter.myOnClick {
-                                            @SuppressLint("NotifyDataSetChanged")
-                                            override fun onClick(p0: View?, position: Int) {
-                                                val builder =
-                                                    AlertDialog.Builder(this@ListWorkoutsFragment.requireContext())
-                                                builder.setTitle("DELETE THIS WORKOUT?")
-                                                builder.setMessage("Are you sure you want to delete one of your previously saved workout sessions?")
-                                                builder.setIcon(android.R.drawable.ic_dialog_alert)
-                                                builder.setPositiveButton("Yes") { dialogInterface, which ->
-                                                    Toast.makeText(
-                                                        context,
-                                                        "deleting workout session...",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                    //val documentId = data[position].getID()
-                                                    data.removeAt(position)
-                                                    adapter.notifyDataSetChanged()
-
-
-                                                    /*firebase = FirebaseFirestore.getInstance()
-                                            firebase.collection("reservations").document(documentId)
-                                                .delete()
-                                                .addOnSuccessListener {
-                                                    //Toast.makeText(activity?.applicationContext, "successfully deleted reservation from firebase", Toast.LENGTH_SHORT).show()
-                                                }
-                                                .addOnFailureListener {
-                                                    //Toast.makeText(activity?.applicationContext, "failed to delete reservation from firebase", Toast.LENGTH_SHORT).show()
-                                                }*/
-
-                                                }
-                                                builder.setNeutralButton("Cancel") { dialogInterface, which ->
-                                                    Toast.makeText(
-                                                        context,
-                                                        "deletion cancelled",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                }
-                                                builder.setNegativeButton("No") { dialogInterface, which ->
-                                                    Toast.makeText(
-                                                        context,
-                                                        "deletion rejected",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                }
-                                                val alertDialog: AlertDialog =
-                                                    builder.create()
-                                                alertDialog.setCancelable(false)
-                                                alertDialog.show()
-                                            }
-                                        })
-                                    binding.recyclerView.adapter = adapter
-                                } catch (err: Error) {
-                                    Log.i("error", "error regarding dialog box (${err})")
-                                }
-                            }.addOnFailureListener {
-                                Log.i("current user", "/")
+                                })
+                            binding.recyclerView.adapter = adapter
+                        } catch (err: Error) {
+                            Log.i("error", "error regarding dialog box (${err})")
                         }
                     }
                     addNumberWorkouts(data.size)
@@ -170,7 +228,7 @@ class ListWorkoutsFragment : Fragment() {
                                 val builder = AlertDialog.Builder(this@ListWorkoutsFragment.requireContext())
                                 builder.setTitle("DELETE THIS WORKOUT?")
                                 builder.setMessage("Are you sure you want to delete one of your previously saved workout sessions?")
-                                builder.setIcon(android.R.drawable.ic_dialog_alert)
+                                builder.setIcon(R.drawable.ic_dialog_alert)
                                 builder.setPositiveButton("Yes") { dialogInterface, which ->
                                     Toast.makeText(context, "deleting workout session...", Toast.LENGTH_LONG).show()
                                     //val documentId = data[position].getID()

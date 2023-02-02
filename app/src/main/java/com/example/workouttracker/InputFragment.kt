@@ -13,7 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentInputBinding
-import com.example.workouttracker.utils.User
 import com.example.workouttracker.utils.Workout
 import com.example.workouttracker.utils.WorkoutType
 import com.google.firebase.auth.FirebaseAuth
@@ -95,20 +94,12 @@ class InputFragment : Fragment() {
             Log.i("id", id.toString())
             if (id != null) {
                 firestore.collection("users").document(id).get().addOnSuccessListener { user ->
-                    //currentUser = user.toObject(User::class.java)!!
-                    /*val username = user.getString("username")!!
-                    val email = user.getString("email")!!
-                    val workouts = user.get("workouts")!! as MutableList<Workout>
-                    currentUser = User(username, email, workouts)
-                    Log.i("current user", currentUser.email)*/
-
                     val startTime = getStartTime()
                     val date = getDate()
                     if (durationInput.text.toString() != "") {
                         val duration = durationInput.text.toString().toInt()
                         val motivation = motivationValue.text.toString().toInt()
                         val exhaustion = exhaustionValue.text.toString().toInt()
-                        //val uuid = UUID.randomUUID().toString()
                         val workout = Workout(selectedWorkoutType, startTime, date, duration, motivation, exhaustion)
 
                         firestore.collection("users").document(id).update("workouts", FieldValue.arrayUnion(workout))
@@ -148,6 +139,9 @@ class InputFragment : Fragment() {
         val timepicker = binding.timePicker
         val hour = timepicker.hour
         val minute = timepicker.minute
+        if (minute < 10) {
+            return "$hour : 0$minute"
+        }
         return "$hour : $minute"
     }
 }

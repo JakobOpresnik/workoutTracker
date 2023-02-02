@@ -1,6 +1,7 @@
 package com.example.workouttracker
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -41,20 +42,58 @@ class RecyclerAdapter(private val dataSet: MutableList<HashMap<String, String>>,
         val date = itemsViewModel["date"]?.replace("-", ". ")
         val time = itemsViewModel["time"]
         val duration: String = itemsViewModel["duration"].toString()
-        val motivation: String = itemsViewModel["motivation"].toString()
-        val exhaustion: String = itemsViewModel["exhaustion"].toString()
+        val motivation: Int = itemsViewModel["motivation"].toString().toInt()
+        val exhaustion: Int = itemsViewModel["exhaustion"].toString().toInt()
 
         holder.type.text = type
         holder.dateTime.text = "on $date at $time"
         if (duration.toInt() == 1) {
-            holder.duration.text = "$duration minute"
+            holder.duration.text = "for $duration minute"
         }
         else {
             holder.duration.text = "for $duration minutes"
         }
 
-        when (motivation) {
-            "10" -> holder.motivation.text = "zero motivation \uD83D\uDE25"
+        if (motivation == 0) {
+            holder.motivation.text = "unmotivated \uD83D\uDE25"
+            holder.motivation.setTextColor(Color.parseColor("#FF0800")) // set text color to red
+        }
+        else if (motivation in 1..3) {
+            holder.motivation.text = "poorly motivated \uD83D\uDE13"
+            holder.motivation.setTextColor(Color.parseColor("#FF8400")) // set text color to orange
+        }
+        else if (motivation in 4..6) {
+            holder.motivation.text = "normally motivated \uD83D\uDE10"
+            holder.motivation.setTextColor(Color.parseColor("#FFB700")) // set text color to yellow
+        }
+        else if (motivation in 7..9) {
+            holder.motivation.text = "highly motivated \uD83D\uDE42"
+            holder.motivation.setTextColor(Color.parseColor("#75C900")) // set text color to lime
+        }
+        else if (motivation == 10) {
+            holder.motivation.text = "extremely motivated \uD83D\uDE01"
+            holder.motivation.setTextColor(Color.parseColor("#00C90A")) // set text color to green
+        }
+
+        if (exhaustion == 0) {
+            holder.exhaustion.text = "not exhausted \uD83D\uDE00"
+            holder.exhaustion.setTextColor(Color.parseColor("#00C90A")) // set text color to green
+        }
+        else if (exhaustion in 1..3) {
+            holder.exhaustion.text = "lighty exhausted \uD83D\uDE42"
+            holder.exhaustion.setTextColor(Color.parseColor("#75C900")) // set text color to lime
+        }
+        else if (exhaustion in 4..6) {
+            holder.exhaustion.text = "normally exhausted \uD83D\uDE10"
+            holder.exhaustion.setTextColor(Color.parseColor("#FFB700")) // set text color to yellow
+        }
+        else if (exhaustion in 7..9) {
+            holder.exhaustion.text = "really exhausted \uD83D\uDE2B"
+            holder.exhaustion.setTextColor(Color.parseColor("#FF8400")) // set text color to orange
+        }
+        else if (exhaustion == 10) {
+            holder.exhaustion.text = "dead \uD83D\uDC80"
+            holder.exhaustion.setTextColor(Color.parseColor("#FF0800")) // set text color to red
         }
 
         holder.line.setOnClickListener { p0 ->
