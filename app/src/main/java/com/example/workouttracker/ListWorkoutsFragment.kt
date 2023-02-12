@@ -73,12 +73,7 @@ class ListWorkoutsFragment : Fragment() {
 
         sortSpinnerAdapter.setDropDownViewResource(R.layout.simple_spinner_item)
         sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedSorting = parent?.getItemAtPosition(position).toString()
                 Log.i("selected workout sorting by date", selectedSorting)
             }
@@ -178,20 +173,8 @@ class ListWorkoutsFragment : Fragment() {
                                                 "deleting workout session...",
                                                 Toast.LENGTH_LONG
                                             ).show()
-                                            //val documentId = data[position].getID()
                                             data.removeAt(position)
                                             adapter.notifyDataSetChanged()
-
-
-                                            /*firebase = FirebaseFirestore.getInstance()
-                                    firebase.collection("reservations").document(documentId)
-                                        .delete()
-                                        .addOnSuccessListener {
-                                            //Toast.makeText(activity?.applicationContext, "successfully deleted reservation from firebase", Toast.LENGTH_SHORT).show()
-                                        }
-                                        .addOnFailureListener {
-                                            //Toast.makeText(activity?.applicationContext, "failed to delete reservation from firebase", Toast.LENGTH_SHORT).show()
-                                        }*/
 
                                         }
                                         builder.setNeutralButton("Cancel") { dialogInterface, which ->

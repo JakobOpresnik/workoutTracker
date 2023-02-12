@@ -8,30 +8,44 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentStatsBinding
 import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.DefaultValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.E
 
 class StatsFragment : Fragment() {
 
     private lateinit var binding: FragmentStatsBinding
+    private lateinit var lineChart: LineChart
     private lateinit var pieChart: PieChart
+    private lateinit var saveFilterButton: ImageButton
 
     private lateinit var navigation: BottomNavigationView
+
+    private lateinit var selectedMetric: String
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -43,7 +57,9 @@ class StatsFragment : Fragment() {
     ): View? {
         binding = FragmentStatsBinding.inflate(inflater, container, false)
         navigation = binding.bottomNavigation
+        lineChart = binding.linechart
         pieChart = binding.piechart
+        saveFilterButton = binding.saveMetricsFilter
 
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -102,14 +118,166 @@ class StatsFragment : Fragment() {
         if (id != null) {
             firestore.collection("users").document(id).get().addOnSuccessListener { user ->
                 val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+
+                // display line chart
+                setupLineChart()
+                loadLineChartData()
+
+                // display pie chart
                 setupPieChart()
                 loadPieChartData(workouts)
+
             }.addOnFailureListener {
                 Log.i("current user", "/")
             }
         }
 
         return binding.root
+    }
+
+    private fun setupLineChart() {
+        lineChart.xAxis.isEnabled = true
+        lineChart.axisLeft.isEnabled = true
+        lineChart.axisRight.isEnabled = true
+        lineChart.xAxis.axisLineColor = Color.WHITE
+        lineChart.xAxis.textColor = Color.WHITE
+        lineChart.axisLeft.axisLineColor = Color.WHITE
+        lineChart.axisLeft.textColor = Color.WHITE
+        lineChart.axisRight.axisLineColor = Color.WHITE
+        lineChart.axisRight.textColor = Color.WHITE
+
+        lineChart.legend.isEnabled = false
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun loadLineChartData() {
+
+        // workout metric filter to display on graph (line chart)
+        val spinner = binding.metricsFilter
+        val spinnerData = arrayListOf("duration", "motivation", "exhaustion")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerData)
+        spinner.adapter = spinnerAdapter
+
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedMetric = parent?.getItemAtPosition(position).toString()
+                Log.i("selected workout metric", selectedMetric)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        val currentDate = LocalDate.now()
+        val lastMonth = mutableListOf<String>()
+        val lastMonthAll = mutableListOf<String>()
+
+        // all dates from last month (properly formatted)
+        for (i in 30 downTo 0) {
+            if (i % 10 == 0) {
+                val date = currentDate.minusDays(i.toLong())
+                val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                val formattedDate = date.format(formatter)
+                lastMonth.add(formattedDate.toString())
+            }
+            else {
+                lastMonth.add("")
+            }
+        }
+
+        for (i in 30 downTo 0) {
+            val date = currentDate.minusDays(i.toLong())
+            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            val formattedDate = date.format(formatter)
+            lastMonthAll.add(formattedDate.toString())
+        }
+        lineChart.xAxis.valueFormatter = XAxisValueFormatter(lastMonth)
+
+        val id = auth.currentUser?.uid
+        if (id != null) {
+            firestore.collection("users").document(id).get()
+                .addOnSuccessListener { user ->
+                    val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                    val dates = mutableListOf<String>()
+                    for (workout in workouts) {
+                        dates.add(workout["date"].toString())
+                    }
+
+                    val entries = ArrayList<Entry>()
+                    for ((index, date) in lastMonthAll.withIndex()) {
+                        if (dates.contains(date)) {
+                            var value = 0
+                            for (workout in workouts) {
+                                if (workout["date"] == date) {
+                                    value += workout["duration"].toString().toInt()
+                                }
+                            }
+                            entries.add(Entry(index.toFloat(), value.toFloat()))
+                        } else {
+                            entries.add(Entry(index.toFloat(), 0F))
+                        }
+                    }
+                    val dataSet = LineDataSet(entries, "LineChart")
+                    dataSet.color = Color.CYAN
+                    dataSet.setCircleColor(Color.BLUE)
+                    dataSet.setDrawCircles(true)
+                    dataSet.setDrawCircleHole(true)
+                    dataSet.circleRadius = 8F
+                    dataSet.circleHoleRadius = 10F
+                    dataSet.lineWidth = 5F
+                    dataSet.valueTextSize = 10F
+                    dataSet.valueTextColor = Color.WHITE
+                    dataSet.setDrawFilled(true)
+                    val lineData = LineData(dataSet)
+                    lineChart.data = lineData
+                    lineChart.invalidate()
+
+                    saveFilterButton.setOnClickListener {
+                        val entries = ArrayList<Entry>()
+                        for ((index, date) in lastMonthAll.withIndex()) {
+                            if (dates.contains(date)) {
+                                var value = 0
+                                for (workout in workouts) {
+                                    if (workout["date"] == date) {
+                                        value += when (selectedMetric) {
+                                            "duration" -> {
+                                                workout["duration"].toString().toInt()
+                                            }
+                                            "motivation" -> {
+                                                workout["motivation"].toString().toInt()
+                                            }
+                                            "exhaustion" -> {
+                                                workout["exhaustion"].toString().toInt()
+                                            }
+                                            else -> {
+                                                workout["duration"].toString().toInt()
+                                            }
+                                        }
+                                    }
+                                }
+                                entries.add(Entry(index.toFloat(), value.toFloat()))
+                            } else {
+                                entries.add(Entry(index.toFloat(), 0F))
+                            }
+                        }
+                        val dataSet = LineDataSet(entries, "LineChart")
+                        dataSet.color = Color.CYAN
+                        dataSet.setCircleColor(Color.BLUE)
+                        dataSet.setDrawCircles(true)
+                        dataSet.setDrawCircleHole(true)
+                        dataSet.circleRadius = 8F
+                        dataSet.circleHoleRadius = 10F
+                        dataSet.lineWidth = 5F
+                        dataSet.valueTextSize = 10F
+                        dataSet.valueTextColor = Color.WHITE
+                        dataSet.setDrawFilled(true)
+                        val lineData = LineData(dataSet)
+                        lineChart.data = lineData
+                        lineChart.invalidate()
+                    }
+                }.addOnFailureListener {
+                    Log.i("current user", "/")
+                }
+        }
     }
 
     private fun setupPieChart() {
@@ -215,5 +383,11 @@ class StatsFragment : Fragment() {
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         return currentDate.format(formatter)
+    }
+}
+
+class XAxisValueFormatter(private val values: List<String>) : ValueFormatter() {
+    override fun getFormattedValue(value: Float): String {
+        return values[value.toInt() % values.size]
     }
 }

@@ -87,7 +87,7 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="35dp"
-                android:background="@drawable/custom_button"
+                android:background="@drawable/custom_button_green"
                 android:fontFamily="@font/montserrat"
                 android:padding="10dp"
                 android:src="@drawable/checkmark"

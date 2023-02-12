@@ -20,4 +20,10 @@
         <item>best first</item>
         <item>worst first</item>
     </string-array>
+
+    <string-array name="workout_metrics">
+        <item>duration</item>
+        <item>motivation</item>
+        <item>exhaustion</item>
+    </string-array>
 </resources>
