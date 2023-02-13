@@ -26,4 +26,11 @@
         <item>motivation</item>
         <item>exhaustion</item>
     </string-array>
+
+    <string-array name="time_metrics">
+        <item>last week</item>
+        <item>last month</item>
+        <item>last year</item>
+        <item>all time</item>
+    </string-array>
 </resources>

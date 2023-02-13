@@ -8,16 +8,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ImageButton
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentStatsBinding
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -25,7 +22,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
@@ -34,7 +30,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.math.E
+import java.time.temporal.ChronoUnit
+import kotlin.math.absoluteValue
+
+enum class GraphDates {
+    ALL, FILTERED
+}
 
 class StatsFragment : Fragment() {
 
@@ -46,6 +47,7 @@ class StatsFragment : Fragment() {
     private lateinit var navigation: BottomNavigationView
 
     private lateinit var selectedMetric: String
+    private lateinit var selectedTimeMetric: String
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -91,8 +93,7 @@ class StatsFragment : Fragment() {
                                 }
                                 if (todayWorkoutCounter > 0) {
                                     findNavController().navigate(R.id.lobbyFragment)
-                                }
-                                else {
+                                } else {
                                     findNavController().navigate(R.id.homeFragment)
                                 }
                             }.addOnFailureListener {
@@ -111,8 +112,6 @@ class StatsFragment : Fragment() {
                 else -> false
             }
         }
-
-
 
         val id = auth.currentUser?.uid
         if (id != null) {
@@ -155,55 +154,67 @@ class StatsFragment : Fragment() {
         // workout metric filter to display on graph (line chart)
         val spinner = binding.metricsFilter
         val spinnerData = arrayListOf("duration", "motivation", "exhaustion")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerData)
+        val spinnerAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerData)
         spinner.adapter = spinnerAdapter
 
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 selectedMetric = parent?.getItemAtPosition(position).toString()
                 Log.i("selected workout metric", selectedMetric)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        val currentDate = LocalDate.now()
-        val lastMonth = mutableListOf<String>()
-        val lastMonthAll = mutableListOf<String>()
+        // time metric filter
+        val timeSpinner = binding.timeMetricsFilter
+        val timeSpinnerData = arrayListOf("all time", "last week", "last month", "last year")
+        val timeSpinnerAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, timeSpinnerData)
+        timeSpinner.adapter = timeSpinnerAdapter
 
-        // all dates from last month (properly formatted)
-        for (i in 30 downTo 0) {
-            if (i % 10 == 0) {
-                val date = currentDate.minusDays(i.toLong())
-                val formatter = DateTimeFormatter.ofPattern("dd/MM")
-                val formattedDate = date.format(formatter)
-                lastMonth.add(formattedDate.toString())
+        timeSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
+        timeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                selectedTimeMetric = parent?.getItemAtPosition(position).toString()
+                Log.i("selected time metric", selectedTimeMetric)
             }
-            else {
-                lastMonth.add("")
-            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        for (i in 30 downTo 0) {
-            val date = currentDate.minusDays(i.toLong())
-            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-            val formattedDate = date.format(formatter)
-            lastMonthAll.add(formattedDate.toString())
-        }
-        lineChart.xAxis.valueFormatter = XAxisValueFormatter(lastMonth)
 
         val id = auth.currentUser?.uid
         if (id != null) {
             firestore.collection("users").document(id).get()
                 .addOnSuccessListener { user ->
                     val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                    val firstWorkout = workouts[0]
+                    val firstDate = firstWorkout["date"]
                     val dates = mutableListOf<String>()
                     for (workout in workouts) {
                         dates.add(workout["date"].toString())
                     }
 
+                    selectedTimeMetric = "all time"
+                    val datesData = getDatesData(selectedTimeMetric, GraphDates.FILTERED, firstDate!!)
+                    val datesAll = getDatesData(selectedTimeMetric, GraphDates.ALL, firstDate)
+                    lineChart.xAxis.valueFormatter = XAxisValueFormatter(datesData)
+
                     val entries = ArrayList<Entry>()
-                    for ((index, date) in lastMonthAll.withIndex()) {
+                    for ((index, date) in datesAll.withIndex()) {
                         if (dates.contains(date)) {
                             var value = 0
                             for (workout in workouts) {
@@ -216,24 +227,16 @@ class StatsFragment : Fragment() {
                             entries.add(Entry(index.toFloat(), 0F))
                         }
                     }
-                    val dataSet = LineDataSet(entries, "LineChart")
-                    dataSet.color = Color.CYAN
-                    dataSet.setCircleColor(Color.BLUE)
-                    dataSet.setDrawCircles(true)
-                    dataSet.setDrawCircleHole(true)
-                    dataSet.circleRadius = 8F
-                    dataSet.circleHoleRadius = 10F
-                    dataSet.lineWidth = 5F
-                    dataSet.valueTextSize = 10F
-                    dataSet.valueTextColor = Color.WHITE
-                    dataSet.setDrawFilled(true)
-                    val lineData = LineData(dataSet)
-                    lineChart.data = lineData
-                    lineChart.invalidate()
+
+                    styleLineChart(entries, Color.RED, Color.WHITE, Color.RED, 5F, 10F)
 
                     saveFilterButton.setOnClickListener {
+                        val datesData = getDatesData(selectedTimeMetric, GraphDates.FILTERED, firstDate)
+                        val datesAll = getDatesData(selectedTimeMetric, GraphDates.ALL, firstDate)
+                        lineChart.xAxis.valueFormatter = XAxisValueFormatter(datesData)
+
                         val entries = ArrayList<Entry>()
-                        for ((index, date) in lastMonthAll.withIndex()) {
+                        for ((index, date) in datesAll.withIndex()) {
                             if (dates.contains(date)) {
                                 var value = 0
                                 for (workout in workouts) {
@@ -259,25 +262,68 @@ class StatsFragment : Fragment() {
                                 entries.add(Entry(index.toFloat(), 0F))
                             }
                         }
-                        val dataSet = LineDataSet(entries, "LineChart")
-                        dataSet.color = Color.CYAN
-                        dataSet.setCircleColor(Color.BLUE)
-                        dataSet.setDrawCircles(true)
-                        dataSet.setDrawCircleHole(true)
-                        dataSet.circleRadius = 8F
-                        dataSet.circleHoleRadius = 10F
-                        dataSet.lineWidth = 5F
-                        dataSet.valueTextSize = 10F
-                        dataSet.valueTextColor = Color.WHITE
-                        dataSet.setDrawFilled(true)
-                        val lineData = LineData(dataSet)
-                        lineChart.data = lineData
-                        lineChart.invalidate()
+                        when (selectedMetric) {
+                            "duration" -> {
+                                styleLineChart(entries, Color.RED, Color.WHITE, Color.RED, 5F, 10F)
+                            }
+                            "motivation" -> {
+                                styleLineChart(
+                                    entries,
+                                    Color.YELLOW,
+                                    Color.WHITE,
+                                    Color.YELLOW,
+                                    5F,
+                                    10F
+                                )
+                            }
+                            "exhaustion" -> {
+                                styleLineChart(
+                                    entries,
+                                    Color.GREEN,
+                                    Color.WHITE,
+                                    Color.GREEN,
+                                    5F,
+                                    10F
+                                )
+                            }
+                        }
                     }
                 }.addOnFailureListener {
                     Log.i("current user", "/")
                 }
         }
+    }
+
+    private fun styleLineChart(
+        entries: ArrayList<Entry>,
+        lineColor: Int,
+        textColor: Int,
+        fillColor: Int,
+        lineWidth: Float,
+        textSize: Float
+    ) {
+        val dataSet = LineDataSet(entries, "")
+        dataSet.color = lineColor
+        dataSet.setDrawCircles(false)
+        dataSet.setDrawCircleHole(false)
+        dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER   // smoothing the graph line
+        //dataSet.setCircleColor(Color.BLUE)
+        //dataSet.circleRadius = 8F
+        //dataSet.circleHoleRadius = 10F
+        dataSet.lineWidth = lineWidth
+        dataSet.valueTextSize = textSize
+        dataSet.valueTextColor = textColor
+        dataSet.setDrawFilled(true)
+        dataSet.fillColor = fillColor
+        val lineData = LineData(dataSet)
+        lineData.setDrawValues(false)
+        lineChart.data = lineData
+        lineChart.description.text = ""
+        /*lineChart.description.textColor = Color.WHITE
+        lineChart.description.textSize = 15F
+        lineChart.description.textAlign = Paint.Align.LEFT
+        lineChart.description.yOffset = 10F*/
+        lineChart.invalidate()
     }
 
     private fun setupPieChart() {
@@ -333,25 +379,26 @@ class StatsFragment : Fragment() {
         }
 
         // setup entries
-        val totalActivites = counterWeightlifting + counterGymCardio + counterRun + counterSprint + counterHike + counterBicycle
+        val totalActivites =
+            counterWeightlifting + counterGymCardio + counterRun + counterSprint + counterHike + counterBicycle
         val entries = ArrayList<PieEntry>()
-        if (counterWeightlifting/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterWeightlifting/totalActivites.toFloat(), "Weightlifting"))
+        if (counterWeightlifting / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterWeightlifting / totalActivites.toFloat(), "Weightlifting"))
         }
-        if (counterGymCardio/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterGymCardio/totalActivites.toFloat(), "Gym Cardio"))
+        if (counterGymCardio / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterGymCardio / totalActivites.toFloat(), "Gym Cardio"))
         }
-        if (counterRun/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterRun/totalActivites.toFloat(), "Run"))
+        if (counterRun / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterRun / totalActivites.toFloat(), "Run"))
         }
-        if (counterSprint/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterSprint/totalActivites.toFloat(), "Sprint"))
+        if (counterSprint / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterSprint / totalActivites.toFloat(), "Sprint"))
         }
-        if (counterHike/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterHike/totalActivites.toFloat(), "Hike"))
+        if (counterHike / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterHike / totalActivites.toFloat(), "Hike"))
         }
-        if (counterBicycle/totalActivites.toFloat() > 0) {
-            entries.add(PieEntry(counterBicycle/totalActivites.toFloat(), "Bike"))
+        if (counterBicycle / totalActivites.toFloat() > 0) {
+            entries.add(PieEntry(counterBicycle / totalActivites.toFloat(), "Bike"))
         }
         val dataSet = PieDataSet(entries, "")
 
@@ -383,6 +430,130 @@ class StatsFragment : Fragment() {
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         return currentDate.format(formatter)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDatesData(filter: String, datesType: GraphDates, firstDate: String): MutableList<String> {
+        val currentDate = LocalDate.now()
+        lateinit var dates: MutableList<String>
+
+        when (filter) {
+            "last week" -> {
+                val lastWeek = mutableListOf<String>()
+                val lastWeekAll = mutableListOf<String>()
+
+                // all dates from last week (properly formatted)
+                for (i in 7 downTo 0) {
+                    if (i % 2 == 0) {
+                        val date = currentDate.minusDays(i.toLong())
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                        val formattedDate = date.format(formatter)
+                        lastWeek.add(formattedDate.toString())
+                    } else {
+                        lastWeek.add("")
+                    }
+                }
+                for (i in 7 downTo 0) {
+                    val date = currentDate.minusDays(i.toLong())
+                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    val formattedDate = date.format(formatter)
+                    lastWeekAll.add(formattedDate.toString())
+                }
+                if (datesType == GraphDates.ALL) {
+                    dates = lastWeekAll
+                } else {
+                    dates = lastWeek
+                }
+            }
+            "last month" -> {
+                val lastMonth = mutableListOf<String>()
+                val lastMonthAll = mutableListOf<String>()
+                for (i in 30 downTo 0) {
+                    if (i % 10 == 0) {
+                        val date = currentDate.minusDays(i.toLong())
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                        val formattedDate = date.format(formatter)
+                        lastMonth.add(formattedDate.toString())
+                    } else {
+                        lastMonth.add("")
+                    }
+                }
+                for (i in 30 downTo 0) {
+                    val date = currentDate.minusDays(i.toLong())
+                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    val formattedDate = date.format(formatter)
+                    lastMonthAll.add(formattedDate.toString())
+                }
+                if (datesType == GraphDates.ALL) {
+                    dates = lastMonthAll
+                } else {
+                    dates = lastMonth
+                }
+            }
+            "last year" -> {
+                val lastYear = mutableListOf<String>()
+                val lastYearAll = mutableListOf<String>()
+                for (i in 366 downTo 0) {
+                    val date = currentDate.minusDays(i.toLong())
+                    val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                    val formattedDate = date.format(formatter)
+                    if (formattedDate == "01/01") {
+                        lastYear.add(formattedDate.toString())
+                    } else {
+                        lastYear.add("")
+                    }
+                }
+                for (i in 365 downTo 0) {
+                    val date = currentDate.minusDays(i.toLong())
+                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    val formattedDate = date.format(formatter)
+                    lastYearAll.add(formattedDate.toString())
+                }
+                if (datesType == GraphDates.ALL) {
+                    dates = lastYearAll
+                } else {
+                    dates = lastYear
+                }
+            }
+            "all time" -> {
+                val allTimeDates = mutableListOf<String>()
+                val allTimeDatesAll = mutableListOf<String>()
+
+                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                val originalDateFormat = LocalDate.parse(firstDate, formatter)
+                val daysFromFirstWorkout = currentDate.until(originalDateFormat, ChronoUnit.DAYS).toInt().absoluteValue
+                for (i in daysFromFirstWorkout downTo 0) {
+                    if (i == daysFromFirstWorkout || i == daysFromFirstWorkout/2) {
+                        val date = currentDate.minusDays(i.toLong())
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                        val formattedDate = date.format(formatter)
+                        allTimeDates.add(formattedDate.toString())
+                    } else {
+                        val date = currentDate.minusDays(i.toLong())
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM")
+                        val formattedDate = date.format(formatter)
+                        if (date == currentDate) {
+                            allTimeDates.add(formattedDate.toString())
+                        }
+                        else {
+                            allTimeDates.add("")
+                        }
+                    }
+                }
+                for (i in daysFromFirstWorkout downTo 0) {
+                    val date = currentDate.minusDays(i.toLong())
+                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    val formattedDate = date.format(formatter)
+                    allTimeDatesAll.add(formattedDate.toString())
+                }
+                if (datesType == GraphDates.ALL) {
+                    dates = allTimeDatesAll
+                } else {
+                    dates = allTimeDates
+                }
+            }
+        }
+        return dates
     }
 }
 
