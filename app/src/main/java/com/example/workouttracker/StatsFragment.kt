@@ -493,15 +493,11 @@ class StatsFragment : Fragment() {
             "last year" -> {
                 val lastYear = mutableListOf<String>()
                 val lastYearAll = mutableListOf<String>()
-                for (i in 366 downTo 0) {
+                for (i in 365 downTo 0) {
                     val date = currentDate.minusDays(i.toLong())
                     val formatter = DateTimeFormatter.ofPattern("dd/MM")
                     val formattedDate = date.format(formatter)
-                    if (formattedDate == "01/01") {
-                        lastYear.add(formattedDate.toString())
-                    } else {
-                        lastYear.add("")
-                    }
+                    lastYear.add(formattedDate.toString())
                 }
                 for (i in 365 downTo 0) {
                     val date = currentDate.minusDays(i.toLong())
