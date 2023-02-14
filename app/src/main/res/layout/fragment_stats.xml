@@ -53,7 +53,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Spinner
+            <TextView
+                android:id="@+id/metrics_filter_multiple"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="35dp"
+                android:fontFamily="@font/montserrat"
+                android:hint="Select metric"
+                android:textColorHint="@color/black_secondary"
+                android:textSize="14sp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="13dp"
+                android:background="@drawable/custom_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+            <!-- <Spinner
                 android:id="@+id/metrics_filter"
                 android:layout_width="110dp"
                 android:layout_height="35dp"
@@ -65,7 +85,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
+                app:layout_constraintTop_toBottomOf="@+id/title" /> -->
 
             <Spinner
                 android:id="@+id/time_metrics_filter"
@@ -78,7 +98,7 @@
                 android:spinnerMode="dialog"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/metrics_filter"
+                app:layout_constraintStart_toEndOf="@+id/metrics_filter_multiple"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <ImageButton
@@ -102,10 +122,10 @@
                 android:id="@+id/linechart"
                 android:layout_width="350dp"
                 android:layout_height="450dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="30dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/metrics_filter" />
+                app:layout_constraintTop_toBottomOf="@+id/metrics_filter_multiple" />
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/piechart"
