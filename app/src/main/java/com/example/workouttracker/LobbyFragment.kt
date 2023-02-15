@@ -86,7 +86,7 @@ class LobbyFragment : Fragment() {
         }
 
         calendarButton.setOnClickListener {
-            findNavController().navigate(R.id.calendarFragment)
+            findNavController().navigate(R.id.planFragment)
         }
 
         statsButton.setOnClickListener {

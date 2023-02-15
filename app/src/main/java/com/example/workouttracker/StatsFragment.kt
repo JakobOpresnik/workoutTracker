@@ -1,7 +1,6 @@
 package com.example.workouttracker
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,8 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
-import androidx.core.content.res.ComplexColorCompat
 import androidx.navigation.fragment.findNavController
 import com.example.workouttracker.databinding.FragmentStatsBinding
 import com.github.mikephil.charting.animation.Easing
@@ -76,7 +73,7 @@ class StatsFragment : Fragment() {
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
-                    findNavController().navigate(R.id.calendarFragment)
+                    findNavController().navigate(R.id.planFragment)
                     true
                 }
                 R.id.stats -> {

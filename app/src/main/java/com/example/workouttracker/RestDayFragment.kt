@@ -37,7 +37,7 @@ class RestDayFragment : Fragment() {
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.calendar -> {
-                    findNavController().navigate(R.id.calendarFragment)
+                    findNavController().navigate(R.id.planFragment)
                     true
                 }
                 R.id.stats -> {

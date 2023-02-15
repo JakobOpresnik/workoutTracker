@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="Calendar"
+        android:title="Plan"
         android:id="@+id/calendar"
-        android:icon="@drawable/calendar"/>
+        android:icon="@drawable/workout_plan"/>
     <item
         android:title="Stats"
         android:id="@+id/stats"

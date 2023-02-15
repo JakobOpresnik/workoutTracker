@@ -37,7 +37,6 @@ class InputFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
-    //private lateinit var currentUser: User
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(

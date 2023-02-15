@@ -48,7 +48,7 @@
             app:destination="@id/statsFragment" />
         <action
             android:id="@+id/action_homeFragment_to_calendarFragment"
-            app:destination="@id/calendarFragment" />
+            app:destination="@id/planFragment" />
         <action
             android:id="@+id/action_homeFragment_to_restDayFragment"
             app:destination="@id/restDayFragment" />
@@ -72,7 +72,7 @@
             app:destination="@id/statsFragment" />
         <action
             android:id="@+id/action_profileFragment_to_calendarFragment"
-            app:destination="@id/calendarFragment" />
+            app:destination="@id/planFragment" />
         <action
             android:id="@+id/action_profileFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
@@ -90,16 +90,16 @@
             app:destination="@id/profileFragment" />
         <action
             android:id="@+id/action_statsFragment_to_calendarFragment"
-            app:destination="@id/calendarFragment" />
+            app:destination="@id/planFragment" />
         <action
             android:id="@+id/action_statsFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
     <fragment
-        android:id="@+id/calendarFragment"
-        android:name="com.example.workouttracker.CalendarFragment"
+        android:id="@+id/planFragment"
+        android:name="com.example.workouttracker.PlanFragment"
         android:label="fragment_calendar"
-        tools:layout="@layout/fragment_calendar" >
+        tools:layout="@layout/fragment_plan" >
         <action
             android:id="@+id/action_calendarFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
@@ -109,6 +109,9 @@
         <action
             android:id="@+id/action_calendarFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_planFragment_to_exercisesFragment"
+            app:destination="@id/exercisesFragment" />
     </fragment>
     <fragment
         android:id="@+id/restDayFragment"
@@ -120,7 +123,7 @@
             app:destination="@id/homeFragment" />
         <action
             android:id="@+id/action_restDayFragment_to_calendarFragment"
-            app:destination="@id/calendarFragment" />
+            app:destination="@id/planFragment" />
         <action
             android:id="@+id/action_restDayFragment_to_statsFragment"
             app:destination="@id/statsFragment" />
@@ -148,5 +151,17 @@
         <action
             android:id="@+id/action_listWorkoutsFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/exercisesFragment"
+        android:name="com.example.workouttracker.ExercisesFragment"
+        android:label="fragment_exercises"
+        tools:layout="@layout/fragment_exercises" >
+        <action
+            android:id="@+id/action_exercisesFragment_to_planFragment"
+            app:destination="@id/planFragment" />
+        <argument
+            android:name="day"
+            app:argType="string" />
     </fragment>
 </navigation>
