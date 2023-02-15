@@ -222,196 +222,11 @@ class StatsFragment : Fragment() {
                                 dates.add(workout["date"].toString())
                             }
 
+                            // graph entries are setup (updated) when clicking 'OK' in the multiple choice dialog
+                            setupEntryValues(workouts, dates, firstDate!!, selectedItems, colors)
+                            // and when clicking on filter save button
                             saveFilterButton.setOnClickListener {
-                                val datesData = getDatesData(selectedTimeMetric, GraphDates.FILTERED, firstDate!!)
-                                val datesAll = getDatesData(selectedTimeMetric, GraphDates.ALL, firstDate)
-                                lineChart.xAxis.valueFormatter = XAxisValueFormatter(datesData)
-
-                                val entries = ArrayList<Entry>()
-                                val entries2 = ArrayList<Entry>()
-                                val entries3 = ArrayList<Entry>()
-                                for ((index, date) in datesAll.withIndex()) {
-                                    if (dates.contains(date)) {
-                                        var value = 0
-                                        var value2 = 0
-                                        var value3 = 0
-                                        for (workout in workouts) {
-                                            if (workout["date"] == date) {
-                                                // when no metric is selected
-                                                if (selectedItems.isEmpty()) {
-                                                    value += workout["duration"].toString().toInt()
-                                                }
-                                                else if (selectedItems.size == 1) {
-                                                    value += when (selectedItems[0]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                }
-                                                else if (selectedItems.size == 2) {
-                                                    value += when (selectedItems[0]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                    value2 += when (selectedItems[1]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                }
-                                                else if (selectedItems.size == 3) {
-                                                    value += when (selectedItems[0]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                    value2 += when (selectedItems[1]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                    value3 += when (selectedItems[2]) {
-                                                        "duration" -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                        "motivation" -> {
-                                                            workout["motivation"].toString().toInt()
-                                                        }
-                                                        "exhaustion" -> {
-                                                            workout["exhaustion"].toString().toInt()
-                                                        }
-                                                        else -> {
-                                                            workout["duration"].toString().toInt()
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        when (selectedItems.size) {
-                                            1 -> {
-                                                entries.add(Entry(index.toFloat(), value.toFloat()))
-                                            }
-                                            2 -> {
-                                                entries.add(Entry(index.toFloat(), value.toFloat()))
-                                                entries2.add(Entry(index.toFloat(), value2.toFloat()))
-                                            }
-                                            3 -> {
-                                                entries.add(Entry(index.toFloat(), value.toFloat()))
-                                                entries2.add(Entry(index.toFloat(), value2.toFloat()))
-                                                entries3.add(Entry(index.toFloat(), value3.toFloat()))
-                                            }
-                                        }
-                                    } else {
-                                        when (selectedItems.size) {
-                                            1 -> {
-                                                entries.add(Entry(index.toFloat(), 0F))
-                                            }
-                                            2 -> {
-                                                entries.add(Entry(index.toFloat(), 0F))
-                                                entries2.add(Entry(index.toFloat(), 0F))
-                                            }
-                                            3 -> {
-                                                entries.add(Entry(index.toFloat(), 0F))
-                                                entries2.add(Entry(index.toFloat(), 0F))
-                                                entries3.add(Entry(index.toFloat(), 0F))
-                                            }
-                                        }
-                                    }
-                                }
-                                when (selectedItems.size) {
-                                    1 -> {
-                                        val dataSets = arrayListOf(entries)
-                                        when (selectedItems[0]) {
-                                            "duration" -> {
-                                                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                            }
-                                            "motivation" -> {
-                                                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                            }
-                                            "exhaustion" -> {
-                                                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                            }
-                                        }
-                                    }
-                                    2 -> {
-                                        val dataSets = arrayListOf(entries, entries2)
-                                        for (item in selectedItems) {
-                                            when (item) {
-                                                "duration" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                                "motivation" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                                "exhaustion" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    3 -> {
-                                        val dataSets = arrayListOf(entries, entries2, entries3)
-                                        for (item in selectedItems) {
-                                            when (item) {
-                                                "duration" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                                "motivation" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                                "exhaustion" -> {
-                                                    styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                setupEntryValues(workouts, dates, firstDate, selectedItems, colors)
                             }
                         }.addOnFailureListener {
                             Log.i("current user", "/")
@@ -485,66 +300,188 @@ class StatsFragment : Fragment() {
                     styleLineChart(selectedItems, dataSet, colors, Color.WHITE, colors, 5F, 10F)
 
                     saveFilterButton.setOnClickListener {
-                        val datesData = getDatesData(selectedTimeMetric, GraphDates.FILTERED, firstDate)
-                        val datesAll = getDatesData(selectedTimeMetric, GraphDates.ALL, firstDate)
-                        lineChart.xAxis.valueFormatter = XAxisValueFormatter(datesData)
-
-                        val entries = ArrayList<Entry>()
-                        for ((index, date) in datesAll.withIndex()) {
-                            if (dates.contains(date)) {
-                                var value = 0
-                                for (workout in workouts) {
-                                    if (workout["date"] == date) {
-                                        value += when (selectedMetric) {
-                                            "duration" -> {
-                                                workout["duration"].toString().toInt()
-                                            }
-                                            "motivation" -> {
-                                                workout["motivation"].toString().toInt()
-                                            }
-                                            "exhaustion" -> {
-                                                workout["exhaustion"].toString().toInt()
-                                            }
-                                            else -> {
-                                                workout["duration"].toString().toInt()
-                                            }
-                                        }
-                                    }
-                                }
-                                entries.add(Entry(index.toFloat(), value.toFloat()))
-                            } else {
-                                entries.add(Entry(index.toFloat(), 0F))
-                            }
-                        }
-                        /*when (selectedMetric) {
-                            "duration" -> {
-                                styleLineChart(entries, Color.RED, Color.WHITE, Color.RED, 5F, 10F)
-                            }
-                            "motivation" -> {
-                                styleLineChart(
-                                    entries,
-                                    Color.YELLOW,
-                                    Color.WHITE,
-                                    Color.YELLOW,
-                                    5F,
-                                    10F
-                                )
-                            }
-                            "exhaustion" -> {
-                                styleLineChart(
-                                    entries,
-                                    Color.GREEN,
-                                    Color.WHITE,
-                                    Color.GREEN,
-                                    5F,
-                                    10F
-                                )
-                            }
-                        }*/
+                        setupEntryValues(workouts, dates, firstDate, selectedItems, colors)
                     }
                 }.addOnFailureListener {
                     Log.i("current user", "/")
                 }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupEntryValues(workouts: MutableList<HashMap<String, String>>, dates: MutableList<String>, firstDate: String, selectedItems: Array<String>, colors: ArrayList<Int>) {
+        val datesData = getDatesData(selectedTimeMetric, GraphDates.FILTERED, firstDate)
+        val datesAll = getDatesData(selectedTimeMetric, GraphDates.ALL, firstDate)
+        lineChart.xAxis.valueFormatter = XAxisValueFormatter(datesData)
+
+        val entries = ArrayList<Entry>()
+        val entries2 = ArrayList<Entry>()
+        val entries3 = ArrayList<Entry>()
+        for ((index, date) in datesAll.withIndex()) {
+            if (dates.contains(date)) {
+                var value = 0
+                var value2 = 0
+                var value3 = 0
+                for (workout in workouts) {
+                    if (workout["date"] == date) {
+                        // when no metric is selected
+                        if (selectedItems.isEmpty()) {
+                            value += workout["duration"].toString().toInt()
+                        }
+                        else if (selectedItems.size == 1) {
+                            value += when (selectedItems[0]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                        }
+                        else if (selectedItems.size == 2) {
+                            value += when (selectedItems[0]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                            value2 += when (selectedItems[1]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                        }
+                        else if (selectedItems.size == 3) {
+                            value += when (selectedItems[0]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                            value2 += when (selectedItems[1]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                            value3 += when (selectedItems[2]) {
+                                "duration" -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                                "motivation" -> {
+                                    workout["motivation"].toString().toInt()
+                                }
+                                "exhaustion" -> {
+                                    workout["exhaustion"].toString().toInt()
+                                }
+                                else -> {
+                                    workout["duration"].toString().toInt()
+                                }
+                            }
+                        }
+                    }
+                }
+                when (selectedItems.size) {
+                    1 -> {
+                        entries.add(Entry(index.toFloat(), value.toFloat()))
+                    }
+                    2 -> {
+                        entries.add(Entry(index.toFloat(), value.toFloat()))
+                        entries2.add(Entry(index.toFloat(), value2.toFloat()))
+                    }
+                    3 -> {
+                        entries.add(Entry(index.toFloat(), value.toFloat()))
+                        entries2.add(Entry(index.toFloat(), value2.toFloat()))
+                        entries3.add(Entry(index.toFloat(), value3.toFloat()))
+                    }
+                }
+            } else {
+                when (selectedItems.size) {
+                    1 -> {
+                        entries.add(Entry(index.toFloat(), 0F))
+                    }
+                    2 -> {
+                        entries.add(Entry(index.toFloat(), 0F))
+                        entries2.add(Entry(index.toFloat(), 0F))
+                    }
+                    3 -> {
+                        entries.add(Entry(index.toFloat(), 0F))
+                        entries2.add(Entry(index.toFloat(), 0F))
+                        entries3.add(Entry(index.toFloat(), 0F))
+                    }
+                }
+            }
+        }
+        when (selectedItems.size) {
+            1 -> {
+                val dataSets = arrayListOf(entries)
+                styleLineChartForMetric(selectedItems[0], selectedItems, dataSets, colors)
+            }
+            2 -> {
+                val dataSets = arrayListOf(entries, entries2)
+                for (item in selectedItems) {
+                    styleLineChartForMetric(item, selectedItems, dataSets, colors)
+                }
+            }
+            3 -> {
+                val dataSets = arrayListOf(entries, entries2, entries3)
+                for (item in selectedItems) {
+                    styleLineChartForMetric(item, selectedItems, dataSets, colors)
+                }
+            }
+        }
+    }
+
+    private fun styleLineChartForMetric(metric: String, selectedItems: Array<String>, dataSets: ArrayList<ArrayList<Entry>>, colors: ArrayList<Int>) {
+        when (metric) {
+            "duration" -> {
+                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
+            }
+            "motivation" -> {
+                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
+            }
+            "exhaustion" -> {
+                styleLineChart(selectedItems, dataSets, colors, Color.WHITE, colors, 5F, 10F)
+            }
         }
     }
 
@@ -571,12 +508,7 @@ class StatsFragment : Fragment() {
 
                         val legendEntries = ArrayList<LegendEntry>()
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet.color = lineColors[1]
@@ -584,12 +516,7 @@ class StatsFragment : Fragment() {
 
                         val legendEntries = ArrayList<LegendEntry>()
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet.color = lineColors[2]
@@ -597,22 +524,11 @@ class StatsFragment : Fragment() {
 
                         val legendEntries = ArrayList<LegendEntry>()
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
 
-                dataSet.setDrawCircles(false)
-                dataSet.setDrawCircleHole(false)
-                dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER   // smoothing the graph line
-                dataSet.lineWidth = lineWidth
-                dataSet.valueTextSize = textSize
-                dataSet.valueTextColor = textColor
-                dataSet.setDrawFilled(true)
+                setupDatasetStyle(dataSet, lineWidth, textSize, textColor)
 
                 val lineData = LineData(dataSet)
                 lineData.setDrawValues(false)
@@ -633,36 +549,21 @@ class StatsFragment : Fragment() {
                         dataSet.fillColor = fillColors[0]
 
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet.color = lineColors[1]
                         dataSet.fillColor = fillColors[1]
 
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet.color = lineColors[2]
                         dataSet.fillColor = fillColors[2]
 
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
                 when (metrics[1]) {
@@ -671,54 +572,26 @@ class StatsFragment : Fragment() {
                         dataSet2.fillColor = fillColors[0]
 
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet2.color = lineColors[1]
                         dataSet2.fillColor = fillColors[1]
 
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet2.color = lineColors[2]
                         dataSet2.fillColor = fillColors[2]
 
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
 
-                dataSet.setDrawCircles(false)
-                dataSet.setDrawCircleHole(false)
-                dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER   // smoothing the graph line
-                dataSet.lineWidth = lineWidth
-                dataSet.valueTextSize = textSize
-                dataSet.valueTextColor = textColor
-                dataSet.setDrawFilled(true)
-
-                dataSet2.setDrawCircles(false)
-                dataSet2.setDrawCircleHole(false)
-                dataSet2.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-                dataSet2.lineWidth = lineWidth
-                dataSet2.valueTextSize = textSize
-                dataSet2.valueTextColor = textColor
-                dataSet2.setDrawFilled(true)
+                setupDatasetStyle(dataSet, lineWidth, textSize, textColor)
+                setupDatasetStyle(dataSet2, lineWidth, textSize, textColor)
 
                 val lineData = LineData(dataSet, dataSet2)
                 lineData.setDrawValues(false)
@@ -740,36 +613,21 @@ class StatsFragment : Fragment() {
                         dataSet.fillColor = fillColors[0]
 
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet.color = lineColors[1]
                         dataSet.fillColor = fillColors[1]
 
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet.color = lineColors[2]
                         dataSet.fillColor = fillColors[2]
 
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
                 when (metrics[1]) {
@@ -778,36 +636,21 @@ class StatsFragment : Fragment() {
                         dataSet2.fillColor = fillColors[0]
 
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet2.color = lineColors[1]
                         dataSet2.fillColor = fillColors[1]
 
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet2.color = lineColors[2]
                         dataSet2.fillColor = fillColors[2]
 
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
                 when (metrics[2]) {
@@ -816,62 +659,27 @@ class StatsFragment : Fragment() {
                         dataSet3.fillColor = fillColors[0]
 
                         val durationLegendEntry = LegendEntry()
-                        durationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        durationLegendEntry.formSize = 10F
-                        durationLegendEntry.label = "Duration"
-                        durationLegendEntry.formColor = Color.RED
-                        legendEntries.add(durationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, durationLegendEntry, "duration", Color.RED)
                     }
                     "motivation" -> {
                         dataSet3.color = lineColors[1]
                         dataSet3.fillColor = fillColors[1]
 
                         val motivationLegendEntry = LegendEntry()
-                        motivationLegendEntry.form = Legend.LegendForm.CIRCLE
-                        motivationLegendEntry.formSize = 10F
-                        motivationLegendEntry.label = "Motivation"
-                        motivationLegendEntry.formColor = Color.YELLOW
-                        legendEntries.add(motivationLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, motivationLegendEntry, "motivation", Color.YELLOW)
                     }
                     "exhaustion" -> {
                         dataSet3.color = lineColors[2]
                         dataSet3.fillColor = fillColors[2]
 
                         val exhaustionLegendEntry = LegendEntry()
-                        exhaustionLegendEntry.form = Legend.LegendForm.CIRCLE
-                        exhaustionLegendEntry.formSize = 10F
-                        exhaustionLegendEntry.label = "Exhaustion"
-                        exhaustionLegendEntry.formColor = Color.GREEN
-                        legendEntries.add(exhaustionLegendEntry)
-                        lineChart.legend.setCustom(legendEntries)
+                        setupLineChartLegend(legendEntries, exhaustionLegendEntry, "exhaustion", Color.GREEN)
                     }
                 }
 
-                dataSet.setDrawCircles(false)
-                dataSet.setDrawCircleHole(false)
-                dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER   // smoothing the graph line
-                dataSet.lineWidth = lineWidth
-                dataSet.valueTextSize = textSize
-                dataSet.valueTextColor = textColor
-                dataSet.setDrawFilled(true)
-
-                dataSet2.setDrawCircles(false)
-                dataSet2.setDrawCircleHole(false)
-                dataSet2.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-                dataSet2.lineWidth = lineWidth
-                dataSet2.valueTextSize = textSize
-                dataSet2.valueTextColor = textColor
-                dataSet2.setDrawFilled(true)
-
-                dataSet3.setDrawCircles(false)
-                dataSet3.setDrawCircleHole(false)
-                dataSet3.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-                dataSet3.lineWidth = lineWidth
-                dataSet3.valueTextSize = textSize
-                dataSet3.valueTextColor = textColor
-                dataSet3.setDrawFilled(true)
+                setupDatasetStyle(dataSet, lineWidth, textSize, textColor)
+                setupDatasetStyle(dataSet2, lineWidth, textSize, textColor)
+                setupDatasetStyle(dataSet3, lineWidth, textSize, textColor)
 
                 val lineData = LineData(dataSet, dataSet2, dataSet3)
                 lineData.setDrawValues(false)
@@ -881,6 +689,25 @@ class StatsFragment : Fragment() {
                 lineChart.invalidate()
             }
         }
+    }
+
+    private fun setupDatasetStyle(dataSet: LineDataSet, lineWidth: Float, textSize: Float, textColor: Int) {
+        dataSet.setDrawCircles(false)
+        dataSet.setDrawCircleHole(false)
+        dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER   // smoothing the graph line
+        dataSet.lineWidth = lineWidth
+        dataSet.valueTextSize = textSize
+        dataSet.valueTextColor = textColor
+        dataSet.setDrawFilled(true)
+    }
+
+    private fun setupLineChartLegend(legendEntries: ArrayList<LegendEntry>, legendEntry: LegendEntry, label: String, color: Int) {
+        legendEntry.form = Legend.LegendForm.CIRCLE
+        legendEntry.formSize = 10F
+        legendEntry.label = label
+        legendEntry.formColor = color
+        legendEntries.add(legendEntry)
+        lineChart.legend.setCustom(legendEntries)
     }
 
     private fun setupPieChart() {
@@ -1076,7 +903,7 @@ class StatsFragment : Fragment() {
                 val originalDateFormat = LocalDate.parse(firstDate, formatter)
                 val daysFromFirstWorkout = currentDate.until(originalDateFormat, ChronoUnit.DAYS).toInt().absoluteValue
                 for (i in daysFromFirstWorkout downTo 0) {
-                    if (i == daysFromFirstWorkout || i == daysFromFirstWorkout/2) {
+                    if (i == daysFromFirstWorkout || i == daysFromFirstWorkout/2 || i == 1) {
                         val date = currentDate.minusDays(i.toLong())
                         val formatter = DateTimeFormatter.ofPattern("dd/MM")
                         val formattedDate = date.format(formatter)
@@ -1085,12 +912,7 @@ class StatsFragment : Fragment() {
                         val date = currentDate.minusDays(i.toLong())
                         val formatter = DateTimeFormatter.ofPattern("dd/MM")
                         val formattedDate = date.format(formatter)
-                        if (date == currentDate) {
-                            allTimeDates.add(formattedDate.toString())
-                        }
-                        else {
-                            allTimeDates.add("")
-                        }
+                        allTimeDates.add(formattedDate.toString())
                     }
                 }
                 for (i in daysFromFirstWorkout downTo 0) {

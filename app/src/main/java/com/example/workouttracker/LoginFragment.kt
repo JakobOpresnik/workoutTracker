@@ -1,6 +1,7 @@
 package com.example.workouttracker
 
 import android.app.ProgressDialog
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -59,32 +60,60 @@ class LoginFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        // login and navigate to new workout page immediately if you haven't done a workout today yet
-        // otherwise navigate to the lobby page (with option to navigate to new workout page)
-        loginButton.setOnClickListener {
-            login()
-            val id = auth.currentUser?.uid
-            if (id != null) {
-                firestore.collection("users").document(id).get()
-                    .addOnSuccessListener { user ->
-                        val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
-                        val currentDate = getDate()
-                        var todayWorkoutCounter = 0
-                        for (workout in workouts) {
-                            if (workout["date"] == currentDate) {
-                                todayWorkoutCounter++
-                            }
+
+        // check if the session of the previously logged in user has expired or not
+        val id = auth.currentUser?.uid
+        if (id != null) {
+            firestore.collection("users").document(id).get()
+                .addOnSuccessListener { user ->
+                    val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                    val currentDate = getDate()
+                    var todayWorkoutCounter = 0
+                    for (workout in workouts) {
+                        if (workout["date"] == currentDate) {
+                            todayWorkoutCounter++
                         }
-                        if (todayWorkoutCounter > 0) {
-                            //val bundle = Bundle()
-                            //bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
-                            findNavController().navigate(R.id.lobbyFragment)
-                        }
-                        else {
-                            findNavController().navigate(R.id.homeFragment)
-                        }
+                    }
+                    if (todayWorkoutCounter > 0) {
+                        //val bundle = Bundle()
+                        //bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
+                        findNavController().navigate(R.id.lobbyFragment)
+                    }
+                    else {
+                        findNavController().navigate(R.id.homeFragment)
+                    }
                 }.addOnFailureListener {
                     Log.i("current user", "/")
+                }
+        }
+        else {
+            // login and navigate to new workout page immediately if you haven't done a workout today yet
+            // otherwise navigate to the lobby page (with option to navigate to new workout page)
+            loginButton.setOnClickListener {
+                login()
+                val id = auth.currentUser?.uid
+                if (id != null) {
+                    firestore.collection("users").document(id).get()
+                        .addOnSuccessListener { user ->
+                            val workouts = user.get("workouts") as MutableList<HashMap<String, String>>
+                            val currentDate = getDate()
+                            var todayWorkoutCounter = 0
+                            for (workout in workouts) {
+                                if (workout["date"] == currentDate) {
+                                    todayWorkoutCounter++
+                                }
+                            }
+                            if (todayWorkoutCounter > 0) {
+                                //val bundle = Bundle()
+                                //bundle.putString("today_workout_counter", todayWorkoutCounter.toString())
+                                findNavController().navigate(R.id.lobbyFragment)
+                            }
+                            else {
+                                findNavController().navigate(R.id.homeFragment)
+                            }
+                        }.addOnFailureListener {
+                            Log.i("current user", "/")
+                        }
                 }
             }
         }
