@@ -10,7 +10,8 @@ enum class MuscleGroup {
     LEGS,
     ABS,
     NECK,
-    HIPS
+    HIPS,
+    RESTDAY
 }
 
 data class WorkoutDay (

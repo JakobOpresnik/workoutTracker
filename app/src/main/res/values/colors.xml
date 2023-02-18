@@ -11,5 +11,6 @@
     <color name="blue">#CC1F75FF</color>
     <color name="red">#CCFF4747</color>
     <color name="black_secondary">#CC000000</color>
-    <color name="green">#69FF4F</color>
+    <color name="green">#CC69FF4F</color>
+    <color name="yellow">#DDFFD000</color>
 </resources>
