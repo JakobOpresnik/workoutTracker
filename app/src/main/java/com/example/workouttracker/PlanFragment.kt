@@ -103,6 +103,9 @@ class PlanFragment : Fragment() {
             }
         }
 
+        val name = arguments?.getString("exercise")
+        Log.i("exercise name", name.toString())
+
 
         val mondayButton = binding.mondayButton
         val tuesdayButton = binding.tuesdayButton
@@ -309,17 +312,20 @@ class PlanFragment : Fragment() {
         var numSpinners = 0
         var lastId = lastInputFieldId
         addButton.setOnClickListener {
+
+            findNavController().navigate(R.id.exercisesFragment)
+
             val constraintLayout = binding.layout
 
             val newSpinner = Spinner(context)
 
             // list of available exercises
             val newSpinnerData = arrayListOf("fly", "dumbbell fly", "bench press", "incline bench press", "decline bench press", "seated dumbbell press", "arnold press",
-                                            "dips", "chest press", "dumbbell chest press", "chest push-up", "regular push-up", "close-grip push-up", "decline push-up",
-                                            "pike push-up", "cable crossover", "cable push-down", "barbell triceps extension", "rope push-down", "triceps kickback",
+                                            "dips", "bench dips", "chest press", "dumbbell bench press", "chest push-up", "regular push-up", "close-grip push-up", "decline push-up",
+                                            "pike push-up", "cable fly", "tricep pushdown", "lying barbell tricep extension", "tricep rope pushdown", "tricep kickback",
                                             "overhead dumbbell extension", "standing dumbbell curl", "barbell curl", "incline dumbbell curl", "hammer curl", "squat",
-                                            "deadlift", "cable curl", "chin-up", "pull-up", "reverse-grip barbell row", "concentration curl", "preacher curl", "drag curl",
-                                            "lat pull-down", "back extension", "barbell bent-over row", "dumbbell bent-over row", "seated row", "incline bench row",
+                                            "deadlift", "cable curl", "chin-up", "pull-up", "concentration curl", "preacher curl", "drag curl",
+                                            "lat pull-down", "back extension", "barbell bent-over row", "dumbbell bent-over row", "seated cable row", "incline bench row",
                                             "plank", "decline crunch", "superman", "reverse fly", "forearm plank", "dumbbell pull-over", "hanging knee raise",
                                             "machine crunch", "crunch", "pallof press", "cable crunch", "russian twist", "ab roll-out", "ball pike", "dumbbell lateral raise",
                                             "cable lateral raise", "dumbbell upright row", "dumbbell front raise", "push press", "muscle-up", "barbell shrug", "dumbbell shrug",

@@ -33,6 +33,21 @@
         <item>last year</item>
         <item>all time</item>
     </string-array>
+
+    <string-array name="muscles_groups">
+        <item>all</item>
+        <item>chest</item>
+        <item>triceps</item>
+        <item>biceps</item>
+        <item>forearms</item>
+        <item>back</item>
+        <item>shoulders</item>
+        <item>legs</item>
+        <item>abs</item>
+        <item>neck</item>
+        <item>hips</item>
+    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
