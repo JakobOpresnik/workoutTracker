@@ -16,7 +16,9 @@
 | LANDING PAGE                                                        | ADD WORKOUT PAGE                                            | PROFILE PAGE                                                  |
 | :---:                                                               | :---:                                                       | :---:                                                         |
 | <img src="screenshots/add_workout_page.jpg" alt="add_workout_page"> | <img src="screenshots/landing_page.jpg" alt="landing_page"> | <img src="screenshots/profile_page.jpg" alt="profile_page">   |
+
 | STATS PAGE                                                          | PIE CHART                                                   | PAST WORKOUTS                                                 |
+| :---:                                                               | :---:                                                       | :---:                                                         |
 | <img src="screenshots/stats_page.jpg" alt="stats_page">             | <img src="screenshots/pie_chart.jpg" alt="pie_chart">       | <img src="screenshots/past_workouts.jpg" alt="past_workouts"> |
 
 </br>
