@@ -6,7 +6,7 @@
 - [x] create a new account (name, email & password)
 - [x] log into your newly created account
 - [x] log activities (set discipline, time, duration, assess your motivation at the start & your exhaustion at the end)
-- [x] visualize the stats of your workout sessions with graphs & pie chart
+- [x] visualize the stats of your workout sessions with graphs & a pie chart
 - [x] view your user profile (quickly edit & update your bio, see your user info, logout)
 - [x] display, filter & sort all your past activities (with all their stats)
 - [ ] formulate, save & edit your own workout plan (select specific exercises from different muscle groups for each day of the week)
