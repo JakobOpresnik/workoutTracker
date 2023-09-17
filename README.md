@@ -3,7 +3,7 @@
 #### Developed in Kotlin & XML, using the Android Studio IDE.
 
 ## FEATURES
-- [x] reate a new account (name, email & password)
+- [x] create a new account (name, email & password)
 - [x] log into your newly created account
 - [x] log activities (set discipline, time, duration, assess your motivation at the start & your exhaustion at the end)
 - [x] visualize the stats of your workout sessions with graphs & pie chart
