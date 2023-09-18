@@ -1,6 +1,6 @@
 # WORKOUT TRACKER
 ### Android app for tracking your workout sessions over time and visualization of your progress &amp; consistency.
-#### Developed in Kotlin & XML, using the Android Studio IDE.
+#### Developed in Kotlin & XML, using the Android Studio IDE & Firestore for storing data in the database.
 
 ## FEATURES
 - [x] create a new account (name, email & password)
